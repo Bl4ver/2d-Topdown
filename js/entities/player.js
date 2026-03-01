@@ -1,8 +1,9 @@
 import { Bullet } from "./bullet.js";
 
 export class Player {
-    constructor(engine) {
-        this.engine = engine;
+    constructor(scene) {
+        this.engine = scene.engine;
+        this.scene = scene;
         this.canvas = this.engine.canvas;
         this.x = this.canvas.width / 2;
         this.y = this.canvas.height / 2;
@@ -24,11 +25,11 @@ export class Player {
     }
 
     init(state) {
-        
+
     }
 
     spawn() {
-        
+
     }
 
     update(input) {
@@ -45,8 +46,11 @@ export class Player {
     }
 
     shoot() {
-        console.log("shoot");
-        let bullet = new Bullet(this.engine);
+        const bullet = this.scene.bulletPool.get();
+        if (bullet) {
+            bullet.spawn(this.x, this.y, this.mouse.x, this.mouse.y);
+            bullet.update();
+        }
     }
 
 
