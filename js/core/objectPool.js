@@ -3,7 +3,7 @@ export class ObjectPool {
         this.engine = engine
         this.ClassType = ClassType; // Bullet, Bot, Enemy
         this.pool = [];
-        
+
         // Előre legyártjuk az alapmennyiséget
         for (let i = 0; i < initialSize; i++) {
             this.pool.push(new this.ClassType(this.engine));
@@ -22,6 +22,22 @@ export class ObjectPool {
 
         obj.active = true;
         return obj;
+    }
+
+    updateAll() {
+        this.pool.forEach(object => {
+            if (object.active) {
+                object.update();
+            }
+        });
+    }
+
+    drawAll() {
+        this.pool.forEach(object => {
+            if (object.active) {
+                object.draw();
+            }
+        });
     }
 
     // Itt nem töröljük le az objektumokat, csak láthatatlanná tesszük őket a ciklusnak

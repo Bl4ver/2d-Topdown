@@ -8,6 +8,8 @@ export class Player {
         this.x = this.canvas.width / 2;
         this.y = this.canvas.height / 2;
         this.speed = 1.2;
+        this.hp = 100;
+        this.damage = 10;
         this.activeWeapon = "pistol";
 
         this.bulletSpeed = 2;
@@ -15,6 +17,7 @@ export class Player {
         this.lastShotTime = 0;
 
         this.mouse = { x: 0, y: 0 };
+        this.active = false;
 
         window.addEventListener('mousemove', (event) => {
             const rect = this.canvas.getBoundingClientRect();
@@ -30,6 +33,15 @@ export class Player {
 
     spawn() {
 
+    }
+
+    takeDamage(damage) {
+        if (this.hp - damage > 0)
+            this.hp -= damage;
+
+        else
+            this.active = false;
+        console.log(this.hp);
     }
 
     update(input) {
@@ -50,13 +62,13 @@ export class Player {
 
         // Ellenőrizzük, hogy eltelt-e már a fireRate által megadott idő
         if (currentTime - this.lastShotTime >= this.fireRate) {
-            
+
             const bullet = this.scene.bulletPool.get();
-            
+
             if (bullet) {
                 // Sikeres lövés esetén frissítjük az utolsó lövés idejét
                 this.lastShotTime = currentTime;
-                
+
                 const dx = this.mouse.x - this.x;
                 const dy = this.mouse.y - this.y;
 

@@ -1,28 +1,28 @@
 // bullet.js
 export class Bullet {
-    constructor(engine) {
-        this.engine = engine;
-        this.canvas = engine.canvas;
-        this.ctx = engine.ctx;
+    constructor(scene) {
+        this.engine = scene.engine;
+        this.scene = scene;
+        this.canvas = this.engine.canvas;
+        this.ctx = this.engine.ctx;
 
         this.x = 0;
         this.y = 0;
+        this.speed = 2;
         this.speedX = 0;
         this.speedY = 0;
         this.active = false; // Alapból inaktív
     }
 
     spawn(x, y, dx, dy) {
-        // A kapott kezdőkoordináták beállítása
         this.x = x;
         this.y = y;
 
         // Normalizálás és sebesség beállítása a jelenlegi objektumon
         const magnitude = Math.sqrt(dx * dx + dy * dy);
-        this.speedX = (dx / magnitude) * 15; 
-        this.speedY = (dy / magnitude) * 15;
+        this.speedX = (dx / magnitude) * this.speed; 
+        this.speedY = (dy / magnitude) * this.speed;
         
-        // Aktiváljuk a golyót
         this.active = true; 
     }
 
