@@ -46,10 +46,22 @@ export class Player {
     }
 
     shoot() {
-        const bullet = this.scene.bulletPool.get();
-        if (bullet) {
-            bullet.spawn(this.x, this.y, this.mouse.x, this.mouse.y);
-            bullet.update(this.engine.canvas);
+        const currentTime = Date.now();
+
+        // Ellenőrizzük, hogy eltelt-e már a fireRate által megadott idő
+        if (currentTime - this.lastShotTime >= this.fireRate) {
+            
+            const bullet = this.scene.bulletPool.get();
+            
+            if (bullet) {
+                // Sikeres lövés esetén frissítjük az utolsó lövés idejét
+                this.lastShotTime = currentTime;
+                
+                const dx = this.mouse.x - this.x;
+                const dy = this.mouse.y - this.y;
+
+                bullet.spawn(this.x, this.y, dx, dy);
+            }
         }
     }
 
@@ -57,16 +69,13 @@ export class Player {
     draw() {
         const ctx = this.engine.ctx;
 
-        // 1. Különbség kiszámítása
         const dx = this.mouse.x - this.x;
         const dy = this.mouse.y - this.y;
 
-        // 2. Szög kiszámítása radiánban
         const angle = Math.atan2(dy, dx);
 
-        ctx.save(); // Állapot mentése
+        ctx.save();
 
-        // 3. A rajzolás középpontját a játékoshoz toljuk
         ctx.translate(this.x, this.y);
 
         /*
@@ -77,16 +86,12 @@ export class Player {
         }
         */
 
-        // 4. Elforgatjuk a "papírt" az egér felé
         ctx.rotate(angle);
-
-        // 5. Kirajzoljuk a háromszöget
         ctx.fillStyle = "#00f3ff";
         ctx.shadowBlur = 15;
         ctx.shadowColor = '#00f3ff'
         ctx.beginPath();
 
-        // Az orra (jobbra néz alapból, mert a 0 radián a pozitív X tengely)
         ctx.beginPath();
         ctx.moveTo(22, 0);
         ctx.lineTo(-12, -14);
@@ -95,6 +100,6 @@ export class Player {
         ctx.closePath();
         ctx.fill();
 
-        ctx.restore(); // Állapot visszaállítása
+        ctx.restore();
     }
 }

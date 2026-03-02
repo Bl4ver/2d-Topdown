@@ -1,5 +1,4 @@
-// bullet.js
-export class Bullet {
+export class Enemy {
     constructor(engine) {
         this.engine = engine;
         this.canvas = engine.canvas;
@@ -19,15 +18,20 @@ export class Bullet {
 
         // Normalizálás és sebesség beállítása a jelenlegi objektumon
         const magnitude = Math.sqrt(dx * dx + dy * dy);
-        this.speedX = (dx / magnitude) * 15; 
+        this.speedX = (dx / magnitude) * 15;
         this.speedY = (dy / magnitude) * 15;
-        
+
         // Aktiváljuk a golyót
-        this.active = true; 
+        this.active = true;
     }
 
     update() {
         if (!this.active) return;
+
+
+        const magnitude = Math.sqrt(dx * dx + dy * dy);
+        this.speedX = (dx / magnitude) * 15;
+        this.speedY = (dy / magnitude) * 15;
 
         this.x += this.speedX;
         this.y += this.speedY;
@@ -39,11 +43,11 @@ export class Bullet {
 
     draw() {
         if (!this.active) return;
-        
+
         this.ctx.fillStyle = "red";
         this.ctx.beginPath();
-        this.ctx.arc(this.x, this.y, 5, 0, Math.PI * 2); 
-        
+        this.ctx.arc(this.x, this.y, 5, 0, Math.PI * 2);
+
         this.ctx.fill();
         this.ctx.closePath();
     }
