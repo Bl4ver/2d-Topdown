@@ -1,11 +1,11 @@
-import { Player } from "../Entities/player.js";
-import { Bullet } from '../Entities/bullet.js';
+import { Player } from "../entities/player.js";
+import { Bullet } from '../entities/bullet.js';
 import { ObjectPool } from "../core/objectPool.js";
 
 export class GameScene {
     constructor(engine) {
         this.engine = engine
-        this.bulletPool = new ObjectPool(Bullet, 200);
+        this.bulletPool = new ObjectPool(Bullet, 200, this.engine);
         this.player = new Player(this);
     }
 

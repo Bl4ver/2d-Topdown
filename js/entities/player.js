@@ -49,7 +49,7 @@ export class Player {
         const bullet = this.scene.bulletPool.get();
         if (bullet) {
             bullet.spawn(this.x, this.y, this.mouse.x, this.mouse.y);
-            bullet.update();
+            bullet.update(this.engine.canvas);
         }
     }
 

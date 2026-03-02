@@ -1,11 +1,12 @@
 export class ObjectPool {
-    constructor(ClassType, initialSize = 100) {
+    constructor(ClassType, initialSize = 100, engine) {
+        this.engine = engine
         this.ClassType = ClassType; // Bullet, Bot, Enemy
         this.pool = [];
         
         // Előre legyártjuk az alapmennyiséget
         for (let i = 0; i < initialSize; i++) {
-            this.pool.push(new this.ClassType());
+            this.pool.push(new this.ClassType(this.engine));
         }
     }
 
@@ -15,7 +16,7 @@ export class ObjectPool {
 
         if (!obj) {
             console.log("Pool bővítése...");
-            obj = new this.ClassType();
+            obj = new this.ClassType(this.engine);
             this.pool.push(obj);
         }
 

@@ -1,5 +1,9 @@
 export class Bullet {
-    constructor() {
+    constructor(engine) {
+        this.engine = engine;
+        this.canvas = engine.canvas;
+        this.ctx = engine.ctx;
+
         this.x = 0;
         this.y = 0;
         this.speedX = 0;
@@ -14,6 +18,7 @@ export class Bullet {
         const velocityY = (dy / magnitude) * 15;
 
         const bullet = new Bullet(x, y, velocityX, velocityY);
+        this.draw();
         // Hozzáadás a GameScene listájához...
     }
 
@@ -24,14 +29,16 @@ export class Bullet {
         this.y += this.speedY;
 
         // Ha kimegy a képből, inaktívvá tesszük, hogy újra felhasználható legyen
-        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+        if (this.x < 0 || this.x > this.canvas.width || this.y < 0 || this.y > this.canvas.height) {
             this.active = false;
         }
+
+        console.log("bullet updated")
     }
 
     draw() {
         if (!this.active) return;
-        ctx.fillStyle = "red";
-        ctx.fillRect(this.x, this.y, 5, 10);
+        this.ctx.fillStyle = "red";
+        this.ctx.fillRect(this.x, this.y, 5, 10);
     }
 }
