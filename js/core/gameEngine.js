@@ -37,7 +37,7 @@ export class GameEngine {
     async start() {
         try {
             // 1. JSON beolvasása
-            this.datas = this.loadDatas();
+            this.datas = await this.loadDatas();
 
             // 2. Alapállapot beállítása a JSON-ből
             this.state = JSON.parse(JSON.stringify(this.datas.state));
