@@ -65,7 +65,7 @@
         <section id="main-menu" class="ui-screen hidden">
             <h1 class="title">NEON</h1>
             <h1 class="altTitle">Overdrive</h1>
-            <p class="description">- Cybercore Protocol: v0.3 -</p>
+            <p class="description">- Cybercore Protocol: v1.0 -</p>
             <div id="menu-buttons">
                 <button id="btn-start" class="button-menu">GAME MODES</button>
                 <button id="btn-upgrades" class="button-menu">UPGRADES</button>
@@ -114,7 +114,16 @@
                 <span id="upgrade-coins-val">0</span>
             </div>
 
-            <div id="weapons-container" class="weapons-grid"></div>
+            <div class="upgrade-tabs">
+                <button class="tab-btn active" data-target="playerUpgrades-container">JÁTÉKOS</button>
+                <button class="tab-btn" data-target="weapons-container">FEGYVEREK</button>
+                <button class="tab-btn" data-target="bots-container">BOTOK</button>
+            </div>
+
+            <div id="playerUpgrades-container" class="upgrade-content active playerUpgrades-grid"></div>
+            <div id="weapons-container" class="upgrade-content weapons-grid"></div>
+            <div id="bots-container" class="upgrade-content bots-grid"></div>
+
 
             <button class="btn-back">VISSZA</button>
         </section>

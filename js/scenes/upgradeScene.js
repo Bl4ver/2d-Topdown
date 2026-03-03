@@ -8,107 +8,162 @@ export class UpgradeScene {
         this.engine.uiManager.bindButtonEvents({
             onBack: () => this.engine.changeScene('menu')
         });
+
+        this.setupTabs();
         this.updateUI();
     }
 
-    // Fegyver feloldása
-    unlockWeapon(weaponId) {
-        const weaponData = this.engine.datas.weapons[weaponId];
-        const weaponState = this.engine.state.inventory.weapons[weaponId];
+    setupTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(btn => {
+            btn.onclick = () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                btn.classList.add('active');
 
-        if (this.engine.state.coins >= weaponData.unlockCost) {
-            this.engine.state.coins -= weaponData.unlockCost;
-            weaponState.unlocked = true;
-            // Minden statot 1-es szintre teszünk feloldáskor
-            for (let key in weaponData.upgrades) {
-                weaponState.levels[key] = 1;
-            }
+                const target = btn.getAttribute('data-target');
+                document.querySelectorAll('.upgrade-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
+            };
+        });
+    }
+
+    // --- LOGIKA ---
+
+    upgradePlayerStat(key) {
+    const data = this.engine.datas.playerUpgrades[key];
+    const currentLevel = this.engine.state.upgrades[key + "Level"] || 1;
+    const cost = data.baseCost * currentLevel;
+
+    if (this.engine.state.coins >= cost) {
+        this.engine.state.coins -= cost;
+        
+        // CSAK A SZINTET NÖVELJÜK!
+        this.engine.state.upgrades[key + "Level"] = currentLevel + 1;
+
+        this.engine.audio.sfx.upgrade();
+        this.engine.save();
+        this.updateUI();
+    }
+}
+
+    unlockWeapon(id) {
+        const weapon = this.engine.datas.weapons[id];
+        if (this.engine.state.coins >= weapon.unlockCost) {
+            this.engine.state.coins -= weapon.unlockCost;
+            this.engine.state.inventory.weapons[id].unlocked = true;
+            this.engine.audio.sfx.upgrade();
             this.engine.save();
-            this.engine.audio.sfx.unlock();
             this.updateUI();
         }
     }
 
-    // Egy konkrét tulajdonság fejlesztése
-    upgradeWeaponStat(weaponId, statKey) {
-        const weaponData = this.engine.datas.weapons[weaponId];
-        const weaponState = this.engine.state.inventory.weapons[weaponId];
-        const currentLevel = weaponState.levels[statKey];
-        const cost = weaponData.upgrades[statKey].baseCost * currentLevel;
+    upgradeWeaponStat(id, statKey) {
+        const weaponData = this.engine.datas.weapons[id];
+        const weaponState = this.engine.state.inventory.weapons[id];
+        const cost = weaponData.upgrades[statKey].baseCost * weaponState.levels[statKey];
 
         if (this.engine.state.coins >= cost) {
             this.engine.state.coins -= cost;
-            weaponState.levels[statKey] += 1;
-            this.engine.save();
+            weaponState.levels[statKey]++;
             this.engine.audio.sfx.upgrade();
+            this.engine.save();
             this.updateUI();
         }
     }
 
-    equipWeapon(weaponId) {
-        this.engine.state.inventory.activeWeapon = weaponId;
-        this.engine.save();
+    equipWeapon(id) {
+        this.engine.state.inventory.activeWeapon = id;
         this.engine.audio.sfx.equip();
+        this.engine.save();
         this.updateUI();
     }
 
+    // --- RENDERELÉS (Template Literals) ---
+
     updateUI() {
-        const coinsEl = document.getElementById('upgrade-coins-val');
-        if (coinsEl) coinsEl.innerText = Math.floor(this.engine.state.coins);
+        document.getElementById('upgrade-coins-val').innerText = Math.floor(this.engine.state.coins);
+        this.renderPlayerUpgrades();
+        this.renderWeapons();
+        this.renderBots();
+    }
 
+    renderPlayerUpgrades() {
+        const container = document.getElementById('playerUpgrades-container');
+        const upgradesData = this.engine.datas?.playerUpgrades;
+        if (!container || !upgradesData) return;
+
+        container.innerHTML = Object.entries(upgradesData).map(([key, data]) => {
+            const lvl = this.engine.state.upgrades[key + "Level"] || 1;
+            const cost = data.baseCost * lvl;
+            const canAfford = this.engine.state.coins >= cost;
+
+            return `
+                <div class="weapon-card">
+                    <h3>${data.name}</h3>
+                    <p>Szint: ${lvl}</p>
+                    <button class="${canAfford ? 'btn-buy' : 'btn-disabled'}" data-action="player-upg" data-key="${key}">
+                        FEJLESZTÉS (${cost} ¤)
+                    </button>
+                </div>`;
+        }).join('');
+        this.bindCardEvents(container);
+    }
+
+    renderWeapons() {
         const container = document.getElementById('weapons-container');
-        if (!container) return;
-        container.innerHTML = "";
+        if (!container || !this.engine.datas?.weapons) return;
 
-        for (let weaponId in this.engine.datas.weapons) {
-            const weaponData = this.engine.datas.weapons[weaponId];
-            const weaponState = this.engine.state.inventory.weapons[weaponId];
+        container.innerHTML = Object.entries(this.engine.datas.weapons).map(([id, data]) => {
+            const state = this.engine.state.inventory.weapons[id];
+            const isActive = this.engine.state.inventory.activeWeapon === id;
 
-            const card = document.createElement('div');
-            card.className = 'weapon-card';
-            card.innerHTML = `<h3>${weaponId.toUpperCase()}</h3>`;
-
-            if (!weaponState.unlocked) {
-                const info = document.createElement('p');
-                info.innerText = `Ár: ${weaponData.unlockCost} ¤`;
-                card.appendChild(info);
-
-                const unlockBtn = document.createElement('button');
-                unlockBtn.innerText = "FELOLDÁS";
-                unlockBtn.className = this.engine.state.coins >= weaponData.unlockCost ? 'btn-buy' : 'btn-disabled';
-                unlockBtn.onclick = () => this.unlockWeapon(weaponId);
-                card.appendChild(unlockBtn);
-            } else {
-                const equipBtn = document.createElement('button');
-                const isActive = this.engine.state.inventory.activeWeapon === weaponId;
-                equipBtn.innerText = isActive ? "FELSZERELVE" : "FELSZEREL";
-                equipBtn.className = isActive ? 'btn-equipped' : 'btn-equip';
-                if (!isActive) equipBtn.onclick = () => this.equipWeapon(weaponId);
-                card.appendChild(equipBtn);
-
-                const upgradesList = document.createElement('div');
-                upgradesList.className = 'upgrades-list';
-
-                for (let statKey in weaponData.upgrades) {
-                    const statData = weaponData.upgrades[statKey];
-                    const level = weaponState.levels[statKey];
-                    const cost = statData.baseCost * level;
-
-                    const row = document.createElement('div');
-                    row.className = 'upgrade-row';
-                    row.innerHTML = `<span class="upgrade-label">${statData.name} (Lv${level})</span>`;
-
-                    const upgBtn = document.createElement('button');
-                    upgBtn.innerText = `+${cost} ¤`;
-                    upgBtn.className = `btn-upgrade-stat ${this.engine.state.coins >= cost ? 'btn-buy' : 'btn-disabled'}`;
-                    upgBtn.onclick = () => this.upgradeWeaponStat(weaponId, statKey);
-
-                    row.appendChild(upgBtn);
-                    upgradesList.appendChild(row);
-                }
-                card.appendChild(upgradesList);
+            if (!state.unlocked) {
+                return `
+                    <div class="weapon-card">
+                        <h3>${id.toUpperCase()}</h3>
+                        <p>Ár: ${data.unlockCost} ¤</p>
+                        <button class="${this.engine.state.coins >= data.unlockCost ? 'btn-buy' : 'btn-disabled'}" 
+                                data-action="w-unlock" data-id="${id}">FELOLDÁS</button>
+                    </div>`;
             }
-            container.appendChild(card);
-        }
+
+            const statsHtml = Object.entries(data.upgrades).map(([sKey, sData]) => {
+                const cost = sData.baseCost * state.levels[sKey];
+                return `
+                    <div class="upgrade-row">
+                        <span class="upgrade-label">${sData.name} (Lv${state.levels[sKey]})</span>
+                        <button class="btn-upgrade-stat ${this.engine.state.coins >= cost ? 'btn-buy' : 'btn-disabled'}" 
+                                data-action="w-upg" data-id="${id}" data-stat="${sKey}">${cost} ¤</button>
+                    </div>`;
+            }).join('');
+
+            return `
+                <div class="weapon-card">
+                    <h3>${id.toUpperCase()}</h3>
+                    <button class="${isActive ? 'btn-equipped' : 'btn-equip'}" data-action="w-equip" data-id="${id}">
+                        ${isActive ? 'FELSZERELVE' : 'FELSZEREL'}
+                    </button>
+                    <div class="upgrades-list">${statsHtml}</div>
+                </div>`;
+        }).join('');
+        this.bindCardEvents(container);
+    }
+
+    renderBots() {
+        const container = document.getElementById('bots-container');
+        if (!container || !this.engine.datas?.bots) return;
+        // Hasonló logika mint a fegyvereknél...
+    }
+
+    bindCardEvents(container) {
+        container.querySelectorAll('button').forEach(btn => {
+            btn.onclick = () => {
+                const d = btn.dataset;
+                if (d.action === "player-upg") this.upgradePlayerStat(d.key);
+                if (d.action === "w-unlock") this.unlockWeapon(d.id);
+                if (d.action === "w-upg") this.upgradeWeaponStat(d.id, d.stat);
+                if (d.action === "w-equip") this.equipWeapon(d.id);
+            };
+        });
     }
 }

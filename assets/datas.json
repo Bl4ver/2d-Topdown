@@ -164,6 +164,28 @@
             }
         }
     },
+    "playerUpgrades": {
+        "maxHp": {
+            "name": "Maximális életerő",
+            "baseCost": 150,
+            "inc": 20
+        },
+        "speed": {
+            "name": "Mozgási sebesség",
+            "baseCost": 200,
+            "inc": 10
+        },
+        "maxShield": {
+            "name": "Pajzs Kapacitás",
+            "baseCost": 250,
+            "inc": 10
+        },
+        "shieldRegen": {
+            "name": "Shield regenerálódás",
+            "baseCost": 200,
+            "inc": 1
+        }
+    },
     "state": {
         "coins": 0,
         "highScore": 0,
@@ -173,9 +195,14 @@
             "musicVolume": 100
         },
         "player": {
-            "maxHp": 100,
-            "damage": 2,
-            "speed": 350
+            "maxHp": 1,
+            "speed": 1,
+            "maxShield": 1,
+            "shieldRegen": 1
+        },
+        "upgrades": {
+            "hpLevel": 1,
+            "speedLevel": 1
         },
         "statistics": {
             "enemiesKilled": 0,
@@ -213,6 +240,16 @@
                         "projectileSpeed": 1,
                         "accuracy": 1
                     }
+                }
+            },
+            "bots": {
+                "repair_bot": {
+                    "unlocked": false,
+                    "level": 1
+                },
+                "attack_bot": {
+                    "unlocked": false,
+                    "level": 1
                 }
             }
         }

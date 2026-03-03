@@ -39,7 +39,7 @@ export class GameScene {
     init() {
         this.engine.uiManager.showScreen("hud");
 
-        this.player.init(this.engine.state);
+        this.player.init(this.engine.state, this.datas);
         this.player.spawn();
         this.player.active = true;
         this.player.hp = this.player.maxHp;

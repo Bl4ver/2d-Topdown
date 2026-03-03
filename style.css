@@ -107,7 +107,7 @@ canvas {
     padding: 1cqmin;
     border: 1px solid var(--neon-gray);
     border-left: 5px solid var(--neon-light-blue);
-    
+
     background-color: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(5px);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
@@ -119,7 +119,7 @@ canvas {
     padding: 2cqmin 3cqmin;
     align-self: center;
     justify-content: flex-end;
-    
+
     color: var(--neon-pink) !important;
     background: rgba(var(--bg-dark), 0.05);
     border-color: var(--neon-pink) !important;
@@ -371,19 +371,22 @@ input[type=range]::-webkit-slider-thumb {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    pointer-events: none; /* Ne blokkolja a játékot */
+    pointer-events: none;
+    /* Ne blokkolja a játékot */
     z-index: 100;
 }
 
 /* --- BAL OLDAL - CSÍKOK --- */
-.hud-left { 
-    width: 250px; 
+.hud-left {
+    width: 250px;
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-.bar-item { width: 100%; }
+.bar-item {
+    width: 100%;
+}
 
 .bar-text {
     display: flex;
@@ -400,16 +403,28 @@ input[type=range]::-webkit-slider-thumb {
     width: 100%;
 }
 
-.fill { 
-    height: 100%; 
-    transition: width 0.3s ease; 
+.fill {
+    height: 100%;
+    transition: width 0.3s ease;
 }
 
-.pink-theme { color: var(--neon-pink); }
-.pink-theme .fill { background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
+.pink-theme {
+    color: var(--neon-pink);
+}
 
-.cyan-theme { color: var(--neon-light-blue); }
-.cyan-theme .fill { background: var(--neon-light-blue); box-shadow: 0 0 10px var(--neon-light-blue); }
+.pink-theme .fill {
+    background: var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+.cyan-theme {
+    color: var(--neon-light-blue);
+}
+
+.cyan-theme .fill {
+    background: var(--neon-light-blue);
+    box-shadow: 0 0 10px var(--neon-light-blue);
+}
 
 
 /* --- KÖZÉPSŐ RÉSZ --- */
@@ -430,11 +445,12 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 .digital-score {
-    font-family: 'monospace'; 
+    font-family: 'monospace';
     font-size: 32px;
     font-weight: 900;
     background-color: var(--neon-light-blue);
-    color: var(--bg-dark); /* Fekete szöveg a cián alapon */
+    color: var(--bg-dark);
+    /* Fekete szöveg a cián alapon */
     padding: 2px 12px;
     border-radius: 4px;
     box-shadow: 0 0 15px var(--neon-light-blue);
@@ -456,13 +472,14 @@ input[type=range]::-webkit-slider-thumb {
     width: 14px;
     height: 14px;
     background: var(--neon-yellow);
-    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); 
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
 }
 
 
 /* --- JOBB OLDAL - SZINT ÉS SZÜNET --- */
 .hud-right {
-    pointer-events: auto; /* Hogy a gomb kattintható legyen */
+    pointer-events: auto;
+    /* Hogy a gomb kattintható legyen */
 }
 
 .level-container {
@@ -486,7 +503,8 @@ input[type=range]::-webkit-slider-thumb {
     background: black;
     box-shadow: 0 0 10px var(--neon-purple);
     cursor: pointer;
-    position: relative; /* a ::after elem pozicionálása miatt fontos */
+    position: relative;
+    /* a ::after elem pozicionálása miatt fontos */
 }
 
 .pause-icon {
@@ -494,10 +512,11 @@ input[type=range]::-webkit-slider-thumb {
     height: 12px;
     border-left: 3px solid white;
     border-right: 3px solid white;
-    transform: rotate(-45deg); /* Visszaforgatjuk, hogy egyenes maradjon */
+    transform: rotate(-45deg);
+    /* Visszaforgatjuk, hogy egyenes maradjon */
 }
 
-.btn-pause{
+.btn-pause {
     z-index: 100;
 }
 
@@ -532,7 +551,8 @@ input[type=range]::-webkit-slider-thumb {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding-top: 5cqmin; /* Kicsit lejjebb toljuk a tartalmát */
+    padding-top: 5cqmin;
+    /* Kicsit lejjebb toljuk a tartalmát */
     overflow-y: auto;
 }
 
@@ -556,7 +576,8 @@ input[type=range]::-webkit-slider-thumb {
     background: rgba(var(--bg-dark), 0.5);
     padding: 1.5cqmin 3cqmin;
     border: 1px solid rgba(255, 242, 0, 0.3);
-    border-left: 5px solid var(--neon-yellow); /* Illeszkedik a cyber-panel stílushoz */
+    border-left: 5px solid var(--neon-yellow);
+    /* Illeszkedik a cyber-panel stílushoz */
     font-family: 'monospace', sans-serif;
     display: flex;
     align-items: center;
@@ -570,25 +591,28 @@ input[type=range]::-webkit-slider-thumb {
     flex-wrap: wrap;
     justify-content: center;
     gap: 3cqmin;
-    width: 80cqmin; /* Igazodik a cyber-panel szélességéhez */
+    width: 95cqmin;
+    /* Igazodik a cyber-panel szélességéhez */
     margin-bottom: 5cqmin;
 }
 
 /* Egy fegyver kártya kinézete (Cyber-panel stílusban) */
 .weapon-card {
-    width: 35cqmin; /* Fix szélesség, hogy 2 elférjen egymás mellett */
+    width: 35cqmin;
+    /* Fix szélesség, hogy 2 elférjen egymás mellett */
     padding: 2cqmin;
     display: flex;
     flex-direction: column;
     align-items: center;
-    
+
     /* A cyber-panelből átemelt kinézet */
     border: 1px solid var(--neon-gray);
-    border-left: 5px solid var(--neon-purple); /* Fegyverekhez lila illik */
+    border-left: 5px solid var(--neon-purple);
+    /* Fegyverekhez lila illik */
     background-color: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(5px);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-    
+
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -680,7 +704,8 @@ input[type=range]::-webkit-slider-thumb {
 #upgrades-screen .btn-back {
     margin-top: auto;
     margin-bottom: 5cqmin;
-    width: 30cqmin; /* Kisebb szélesség, hogy ne húzódjon ki a széléig */
+    width: 30cqmin;
+    /* Kisebb szélesség, hogy ne húzódjon ki a széléig */
 }
 
 /* --- FEGYVER STATISZTIKÁK (4 soros lista a kártyán belül) --- */
@@ -707,7 +732,8 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 .upgrade-row:hover {
-    background: rgba(188, 19, 254, 0.1); /* Halvány lila hover */
+    background: rgba(188, 19, 254, 0.1);
+    /* Halvány lila hover */
     border-left: 2px solid var(--neon-purple);
 }
 
@@ -725,4 +751,67 @@ input[type=range]::-webkit-slider-thumb {
     margin: 0 !important;
     width: auto !important;
     min-width: 8cqmin;
+}
+
+/* --- TABS STÍLUSA --- */
+.upgrade-tabs {
+    display: flex;
+    gap: 1cqmin;
+    margin-bottom: 3cqmin;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+    padding-bottom: 1cqmin;
+}
+
+.tab-btn {
+    background: transparent;
+    border: 1px solid var(--neon-gray);
+    color: var(--neon-gray);
+    padding: 1cqmin 3cqmin;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+    /* Cyberpunk vágás */
+}
+
+.tab-btn.active {
+    border-color: var(--neon-light-blue);
+    color: var(--neon-light-blue);
+    background: rgba(0, 243, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+}
+
+.tab-btn:hover:not(.active) {
+    border-color: white;
+    color: white;
+}
+
+/* --- TARTALOM KEZELÉSE --- */
+.upgrade-content {
+    display: none;
+    /* Alapból minden rejtett */
+    width: 95cqmin;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2cqmin;
+    margin-bottom: 5cqmin;
+}
+
+.upgrade-content.active {
+    display: flex;
+    /* Csak az aktív fül tartalma látszik */
+}
+
+/* Kisebb kártyaméret, hogy több kiférjen */
+.weapon-card {
+    width: 30cqmin;
+    padding: 1.5cqmin;
+}
+
+/* Mobil/Kisebb képernyő optimalizálás */
+@media (max-width: 800px) {
+    .weapon-card {
+        width: 40cqmin;
+    }
 }

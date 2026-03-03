@@ -129,19 +129,42 @@ export class GameEngine {
         if (localSave) {
             const parsedSave = JSON.parse(localSave);
 
-            // Biztonságos összefésülés, hogy ne legyen 'undefined' hiba
+            // Mély összefésülés (Deep Merge), hogy semmi ne legyen undefined
             this.state = {
-                ...this.state,
-                ...parsedSave,
+                ...this.state,          // Alapértékek a JSON-ből
+                ...parsedSave,          // Globális értékek (coins, highScore, stb.)
+
+                // 1. Játékos aktuális statisztikái (maxHp, maxShield, speed...)
+                player: {
+                    ...this.state.player,
+                    ...(parsedSave.player || {})
+                },
+
+                // 2. Fejlesztési szintek (hpLevel, shieldLevel...)
+                upgrades: {
+                    ...this.state.upgrades,
+                    ...(parsedSave.upgrades || {})
+                },
+
+                // 3. Inventory (Fegyverek és Botok)
                 inventory: {
                     ...this.state.inventory,
                     ...(parsedSave.inventory || {}),
+
+                    // Fegyver szintek és unlock állapotok
                     weapons: {
                         ...this.state.inventory.weapons,
                         ...(parsedSave.inventory?.weapons || {})
+                    },
+
+                    // Botok unlock állapota és szintjei
+                    bots: {
+                        ...this.state.inventory.bots,
+                        ...(parsedSave.inventory?.bots || {})
                     }
                 }
             };
+            console.log("Mentés sikeresen betöltve:", this.state);
         }
     }
 
