@@ -24,10 +24,10 @@ export class ObjectPool {
         return obj;
     }
 
-    updateAll() {
+    updateAll(dt) {
         this.pool.forEach(object => {
             if (object.active) {
-                object.update();
+                object.update(dt);
             }
         });
     }

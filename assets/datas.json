@@ -1,0 +1,55 @@
+{
+    "enemies": {
+        "basic": { "hp": 10, "damage": 0, "speed": 200, "width": 30, "height": 30, "radius": 30, "scoreValue": 100, "earnedCoin": 10, "rotationSpeed": 3, "color": "#b300ff", "type": "melee", "level": 1 },
+        "fast": { "hp": 6, "damage": 0, "speed": 299, "width": 15, "height": 15, "radius": 15, "scoreValue": 150, "earnedCoin": 15, "rotationSpeed": 10, "color": "yellow", "type": "melee", "level": 2 },
+        "elite": { "hp": 50, "damage": 0, "speed": 150, "width": 30, "height": 30, "radius": 30, "scoreValue": 250, "earnedCoin": 50, "rotationSpeed": 2, "color": "red", "type": "melee", "level": 3 },
+        "guard": { "hp": 500, "damage": 0, "speed": 75, "width": 60, "height": 60, "radius": 60, "scoreValue": 250, "earnedCoin": 300, "rotationSpeed": 1, "color": "orange", "type": "melee", "level": 4 },
+        "boss": { "hp": 10000, "damage": 0, "speed": 25, "width": 150, "height": 150, "radius": 150, "scoreValue": 250, "earnedCoin": 2000, "rotationSpeed": 0.1, "color": "gray", "type": "melee", "level": 5 }
+    },
+    "weapons": {
+        "pistol": {
+            "type": "projectile",
+            "baseDamage": 10, "baseFireRate": 400, "bulletSpeed": 800, "baseAccuracy": 0.15, "unlockCost": 0,
+            "upgrades": {
+                "damage": { "inc": 2, "baseCost": 50, "name": "Sebzés" },
+                "fireRate": { "inc": -20, "baseCost": 80, "name": "Tűzgyorsaság" },
+                "projectileSpeed": { "inc": 100, "baseCost": 40, "name": "Lövedék Sebesség" },
+                "accuracy": { "inc": -0.02, "baseCost": 60, "name": "Pontosság" }
+            }
+        },
+        "machinegun": {
+            "type": "projectile",
+            "baseDamage": 5, "baseFireRate": 120, "bulletSpeed": 1200, "baseAccuracy": 0.3, "unlockCost": 500,
+            "upgrades": {
+                "damage": { "inc": 1, "baseCost": 100, "name": "Sebzés" },
+                "fireRate": { "inc": -5, "baseCost": 150, "name": "Tűzgyorsaság" },
+                "projectileSpeed": { "inc": 150, "baseCost": 80, "name": "Lövedék Sebesség" },
+                "accuracy": { "inc": -0.03, "baseCost": 120, "name": "Pontosság" }
+            }
+        },
+        "missile": {
+            "type": "homing",
+            "baseDamage": 40, "baseFireRate": 1200, "bulletSpeed": 400, "turnSpeed": 5, "baseAccuracy": 0.5, "unlockCost": 1500,
+            "upgrades": {
+                "damage": { "inc": 10, "baseCost": 200, "name": "Sebzés" },
+                "fireRate": { "inc": -100, "baseCost": 300, "name": "Tűzgyorsaság" },
+                "projectileSpeed": { "inc": 50, "baseCost": 150, "name": "Lövedék Sebesség" },
+                "accuracy": { "inc": -0.05, "baseCost": 200, "name": "Pontosság" }
+            }
+        }
+    },
+    "state": {
+        "coins": 0, "highScore": 0,
+        "settings": { "volume": 50, "sfxVolume": 100, "musicVolume": 100 },
+        "player": { "maxHp": 100, "damage": 2, "speed": 350 },
+        "statistics": { "enemiesKilled": 0, "totalGamesPlayed": 0, "totalPlayTime": 0, "maxTime": 0, "minTime": 0 },
+        "inventory": {
+            "activeWeapon": "pistol",
+            "weapons": {
+                "pistol": { "unlocked": true, "levels": { "damage": 1, "fireRate": 1, "projectileSpeed": 1, "accuracy": 1 } },
+                "machinegun": { "unlocked": false, "levels": { "damage": 1, "fireRate": 1, "projectileSpeed": 1, "accuracy": 1 } },
+                "missile": { "unlocked": false, "levels": { "damage": 1, "fireRate": 1, "projectileSpeed": 1, "accuracy": 1 } }
+            }
+        }
+    }
+}

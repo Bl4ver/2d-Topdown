@@ -10,8 +10,7 @@
     --bg-light-dark: #161616;
 }
 
-/* MARK: Általános
-*/
+/* MARK: Általános */
 
 * {
     margin: 0;
@@ -61,7 +60,6 @@ canvas {
     display: none !important;
 }
 
-
 .credits {
     color: var(--neon-yellow);
     font-size: 3.5cqmin;
@@ -77,7 +75,6 @@ canvas {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
 }
 
 .title {
@@ -93,19 +90,17 @@ canvas {
 }
 
 .description {
-
     font-size: 1.5cqmin;
     color: var(--neon-gray);
     text-shadow: 0 0 20px var(--neon-gray);
     font-style: italic;
 }
 
-
 .cyber-panel {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;;
+    justify-content: center;
 
     width: 75cqmin;
     height: 50cqmin;
@@ -118,8 +113,7 @@ canvas {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
-
-/* Back Button egyedi stílusa a panelen belül */
+/* Back Button egyedi stílusa a panelen belül és globálisan */
 .btn-back {
     margin-top: 2cqmin;
     padding: 2cqmin 3cqmin;
@@ -147,8 +141,8 @@ canvas {
     box-shadow: 0 0 30px var(--neon-pink) !important;
 }
 
-/* MARK: - FŐMENÜ STÍLUSA
-*/
+
+/* MARK: - FŐMENÜ STÍLUSA */
 
 #menu-buttons {
     width: 50cqmin;
@@ -173,7 +167,6 @@ canvas {
     overflow: hidden;
 }
 
-
 #btn-start {
     color: var(--neon-light-blue);
     border: 2px solid var(--neon-light-blue);
@@ -185,7 +178,6 @@ canvas {
         transform: translateY(-2px);
     }
 }
-
 
 #btn-upgrades {
     color: var(--neon-purple);
@@ -236,8 +228,7 @@ canvas {
 }
 
 
-/* MARK: - SETTINGS STÍLUSA
-*/
+/* MARK: - SETTINGS STÍLUSA */
 
 .settings-list {
     margin: 4cqmin 0;
@@ -321,15 +312,7 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 
-
-
-
-/* MARK: - STATISTICS STÍLUSA
-*/
-
-
-
-/* A statisztikai értékek színei osztályként */
+/* MARK: - STATISTICS STÍLUSA */
 
 .stats-list {
     width: 100%;
@@ -341,27 +324,21 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 /* Chrome, Edge, Safari támogatás */
-
-/* 1. A görgetősáv teljes szélessége */
 .stats-list::-webkit-scrollbar {
     width: 4px;
 }
 
-/* 2. A sín (háttér), amin a csúszka mozog */
 .stats-list::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.2);
     border-radius: 0;
 }
 
-/* 3. Maga a csúszka (a mozgó rész) */
 .stats-list::-webkit-scrollbar-thumb {
     background: var(--neon-blue);
-    /* Neon ragyogás effekt */
     box-shadow: 0 0 10px var(--neon-blue);
     border-radius: 2px;
 }
 
-/* 4. Interakció: ha ráközelít az egér, fényesebb lesz */
 .stats-list::-webkit-scrollbar-thumb:hover {
     background: var(--neon-light-blue);
     box-shadow: 0 0 15px var(--neon-light-blue);
@@ -382,10 +359,7 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 
-
-
-/* MARK: - HUD
-*/
+/* MARK: - HUD */
 
 /* HUD ELRENDEZÉS */
 .hud-top-container {
@@ -393,56 +367,79 @@ input[type=range]::-webkit-slider-thumb {
     top: 0;
     left: 0;
     width: 100%;
-    padding: 10px 20px;
+    padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    pointer-events: none;
+    pointer-events: none; /* Ne blokkolja a játékot */
+    z-index: 100;
 }
 
-/* BAL OLDAL - CSÍKOK */
-.hud-left { width: 220px; }
+/* --- BAL OLDAL - CSÍKOK --- */
+.hud-left { 
+    width: 250px; 
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
 
-.bar-item { margin-bottom: 10px; }
+.bar-item { width: 100%; }
 
 .bar-text {
     display: flex;
     justify-content: space-between;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 900;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
 }
 
 .bar-line {
-    height: 4px;
-    background: rgba(0, 0, 0, 0.5);
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
     width: 100%;
 }
 
-.fill { height: 100%; width: 100%; transition: width 0.3s ease; }
+.fill { 
+    height: 100%; 
+    transition: width 0.3s ease; 
+}
 
-/* Színkódok a kép alapján */
 .pink-theme { color: var(--neon-pink); }
-.pink-theme .fill { background: var(--neon-pink); box-shadow: 0 0 8px var(--neon-pink); }
+.pink-theme .fill { background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
 
 .cyan-theme { color: var(--neon-light-blue); }
-.cyan-theme .fill { background: var(--neon-light-blue); box-shadow: 0 0 8px var(--neon-light-blue); }
+.cyan-theme .fill { background: var(--neon-light-blue); box-shadow: 0 0 10px var(--neon-light-blue); }
 
-/* KÖZÉPSŐ RÉSZ */
+
+/* --- KÖZÉPSŐ RÉSZ --- */
 .hud-center {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 8px;
     margin-top: -5px;
 }
 
+.run-time {
+    font-family: 'monospace';
+    color: var(--neon-gray);
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 2px;
+}
+
 .digital-score {
-    font-family: 'monospace'; /* Vagy tölts be egy 'Digital' fontot */
-    font-size: 40px;
+    font-family: 'monospace'; 
+    font-size: 32px;
     font-weight: 900;
-    color: var(--neon-light-blue);
-    text-shadow: 0 0 15px var(--neon-light-blue);
-    letter-spacing: 5px;
+    background-color: var(--neon-light-blue);
+    color: var(--bg-dark); /* Fekete szöveg a cián alapon */
+    padding: 2px 12px;
+    border-radius: 4px;
+    box-shadow: 0 0 15px var(--neon-light-blue);
+    letter-spacing: 4px;
+    line-height: 1.1;
 }
 
 .money-row {
@@ -450,18 +447,24 @@ input[type=range]::-webkit-slider-thumb {
     align-items: center;
     gap: 8px;
     color: var(--neon-yellow);
-    font-weight: bold;
-    font-size: 14px;
+    font-weight: 900;
+    font-size: 16px;
+    text-shadow: 0 0 8px var(--neon-yellow);
 }
 
 .coin-icon {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     background: var(--neon-yellow);
-    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Rombusz érme */
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); 
 }
 
-/* JOBB OLDAL - SZINT ÉS SZÜNET */
+
+/* --- JOBB OLDAL - SZINT ÉS SZÜNET --- */
+.hud-right {
+    pointer-events: auto; /* Hogy a gomb kattintható legyen */
+}
+
 .level-container {
     display: flex;
     align-items: center;
@@ -470,7 +473,6 @@ input[type=range]::-webkit-slider-thumb {
     padding-right: 15px;
     gap: 10px;
 }
-
 
 .pause-diamond {
     width: 35px;
@@ -483,6 +485,8 @@ input[type=range]::-webkit-slider-thumb {
     margin: 5px;
     background: black;
     box-shadow: 0 0 10px var(--neon-purple);
+    cursor: pointer;
+    position: relative; /* a ::after elem pozicionálása miatt fontos */
 }
 
 .pause-icon {
@@ -490,7 +494,21 @@ input[type=range]::-webkit-slider-thumb {
     height: 12px;
     border-left: 3px solid white;
     border-right: 3px solid white;
-    transform: rotate(-45deg); /* Hogy a jel egyenes maradjon a rombuszban */
+    transform: rotate(-45deg); /* Visszaforgatjuk, hogy egyenes maradjon */
+}
+
+.btn-pause{
+    z-index: 100;
+}
+
+/* A láthatatlan, nagyobb kattintási zóna a gomb körül */
+.btn-pause::after {
+    content: '';
+    position: absolute;
+    top: -15px;
+    bottom: -15px;
+    left: -15px;
+    right: -15px;
 }
 
 .level-label {
@@ -498,4 +516,213 @@ input[type=range]::-webkit-slider-thumb {
     font-weight: 900;
     font-style: italic;
     color: white;
+}
+
+
+/* MARK: - UPGRADES STÍLUSA */
+
+#upgrades-screen {
+    /* Ugyanaz a pozicionálás, mint a többi ui-screen-nél */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 5cqmin; /* Kicsit lejjebb toljuk a tartalmát */
+    overflow-y: auto;
+}
+
+/* Főcím (Illeszkedik a .title osztályhoz) */
+#upgrades-screen h2 {
+    font-size: 6cqmin;
+    color: var(--neon-light-blue);
+    text-shadow: 0 0 20px var(--neon-light-blue);
+    font-style: italic;
+    margin-bottom: 2cqmin;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+/* Pénz kijelző doboz a Fegyvertárban (Kizárólag ide vonatkozó stílus, nem rontja el a HUD-ot) */
+#upgrades-screen .money-row {
+    font-size: 2.5cqmin;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 10px rgba(255, 242, 0, 0.8);
+    margin-bottom: 4cqmin;
+    background: rgba(var(--bg-dark), 0.5);
+    padding: 1.5cqmin 3cqmin;
+    border: 1px solid rgba(255, 242, 0, 0.3);
+    border-left: 5px solid var(--neon-yellow); /* Illeszkedik a cyber-panel stílushoz */
+    font-family: 'monospace', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    backdrop-filter: blur(5px);
+}
+
+/* --- FEGYVER KÁRTYÁK RÁCSA (GRID) --- */
+.weapons-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3cqmin;
+    width: 80cqmin; /* Igazodik a cyber-panel szélességéhez */
+    margin-bottom: 5cqmin;
+}
+
+/* Egy fegyver kártya kinézete (Cyber-panel stílusban) */
+.weapon-card {
+    width: 35cqmin; /* Fix szélesség, hogy 2 elférjen egymás mellett */
+    padding: 2cqmin;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    /* A cyber-panelből átemelt kinézet */
+    border: 1px solid var(--neon-gray);
+    border-left: 5px solid var(--neon-purple); /* Fegyverekhez lila illik */
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Kártya lebegtetés (Hover) effektus */
+.weapon-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
+}
+
+/* Fegyver neve */
+.weapon-card h3 {
+    margin: 0 0 1.5cqmin 0;
+    font-size: 3cqmin;
+    color: white;
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/* Szint és árinformációk */
+.weapon-card p {
+    margin: 0.5cqmin 0 2cqmin 0;
+    font-size: 2cqmin;
+    color: var(--neon-gray);
+    font-family: 'monospace', sans-serif;
+}
+
+/* --- DINAMIKUS GOMBOK (A Főmenü stílusára alapozva) --- */
+/* Alap gomb stílus a kártyán belül */
+.weapon-card button {
+    width: 100%;
+    margin-top: 1cqmin;
+    font-size: 1.5cqmin;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: bold;
+    background: rgba(var(--bg-dark), 0.05);
+    padding: 1.5cqmin;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Vásárlás / Fejlesztés gomb (Ha van elég pénz) */
+.btn-buy {
+    color: var(--neon-purple);
+    border: 2px solid var(--neon-purple);
+}
+
+.btn-buy:hover {
+    background: var(--neon-purple);
+    color: black;
+    box-shadow: 0 0 20px var(--neon-purple);
+    transform: translateY(-2px);
+}
+
+/* Felszerelés gomb */
+.btn-equip {
+    color: var(--neon-light-blue);
+    border: 2px solid var(--neon-light-blue);
+}
+
+.btn-equip:hover {
+    background: var(--neon-light-blue);
+    color: black;
+    box-shadow: 0 0 20px var(--neon-light-blue);
+    transform: translateY(-2px);
+}
+
+/* Felszerelve állapot (Aktív fegyver) */
+.btn-equipped {
+    background: var(--neon-green) !important;
+    color: black !important;
+    border: 2px solid var(--neon-green) !important;
+    cursor: default !important;
+    box-shadow: 0 0 15px var(--neon-green);
+}
+
+/* Nincs elég pénz (Disabled gomb) */
+.btn-disabled {
+    color: var(--neon-gray);
+    border: 2px solid var(--neon-gray);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Upgrades screen Vissza gomb pozíció módosítás */
+#upgrades-screen .btn-back {
+    margin-top: auto;
+    margin-bottom: 5cqmin;
+    width: 30cqmin; /* Kisebb szélesség, hogy ne húzódjon ki a széléig */
+}
+
+/* --- FEGYVER STATISZTIKÁK (4 soros lista a kártyán belül) --- */
+.upgrades-list {
+    width: 100%;
+    margin-top: 2cqmin;
+    border-top: 1px solid rgba(121, 121, 121, 0.3);
+    padding-top: 1cqmin;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqmin;
+}
+
+/* Egyetlen tulajdonság sora (pl. Sebzés) */
+.upgrade-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.8cqmin 1.5cqmin;
+    border-radius: 4px;
+    border-left: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.upgrade-row:hover {
+    background: rgba(188, 19, 254, 0.1); /* Halvány lila hover */
+    border-left: 2px solid var(--neon-purple);
+}
+
+.upgrade-label {
+    font-size: 1.6cqmin;
+    color: var(--neon-gray);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Kisebb, kompakt fejlesztés gombok a sorok végén */
+.btn-upgrade-stat {
+    font-size: 1.4cqmin !important;
+    padding: 0.6cqmin 1.2cqmin !important;
+    margin: 0 !important;
+    width: auto !important;
+    min-width: 8cqmin;
 }

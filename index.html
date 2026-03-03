@@ -14,9 +14,10 @@
     <canvas id="gameCanvas"></canvas>
 
     <div id="ui-layer">
+        <!-- MARK: HUD -->
         <div id="hud" class="ui-screen hidden">
             <div class="hud-top-container">
-                <!--
+
                 <div class="hud-left">
                     <div class="bar-item pink-theme">
                         <div class="bar-text">
@@ -24,21 +25,23 @@
                             <span id="hp-val">100%</span>
                         </div>
                         <div class="bar-line">
-                            <div id="hp-fill" class="fill"></div>
+                            <div id="hp-fill" class="fill" style="width: 100%;"></div>
                         </div>
                     </div>
                     <div class="bar-item cyan-theme">
                         <div class="bar-text">
                             <label>PAJZS</label>
-                            <span id="shield-val">100%</span>
+                            <span id="shield-val">0%</span>
                         </div>
                         <div class="bar-line">
-                            <div id="shield-fill" class="fill"></div>
+                            <div id="shield-fill" class="fill" style="width: 0%;"></div>
                         </div>
                     </div>
                 </div>
-            -->
+
                 <div class="hud-center">
+                    <div id="run-time-display" class="run-time">00:00</div>
+
                     <div id="score" class="digital-score">000000</div>
                     <div class="money-row">
                         <div class="coin-icon"></div>
@@ -54,6 +57,7 @@
                         <div class="level-label">SZINT 01</div>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -102,15 +106,17 @@
         </section>
 
         <!-- MARK: Upgrade Screen -->
-        <section id="upgrade-screen" class="ui-screen hidden">
-            <h2>BOT COMMANDER</h2>
-            <div class="inventory-layout">
-                <div id="bot-slots">
-                </div>
-                <div id="item-details">
-                </div>
+        <section id="upgrades-screen" class="ui-screen hidden">
+            <h2>FEGYVERTÁR</h2>
+
+            <div class="money-row">
+                <span>Kreditek: </span>
+                <span id="upgrade-coins-val">0</span>
             </div>
-            <button class="btn-back">BACK</button>
+
+            <div id="weapons-container" class="weapons-grid"></div>
+
+            <button class="btn-back">VISSZA</button>
         </section>
 
         <!-- MARK: Statistics Screen -->
@@ -138,6 +144,11 @@
                     <div class="stat-row">
                         <label>VÉGTELEN REKORDIDŐ</label>
                         <span id="stat-maxTime" class="stat-value cyan-text">00:00</span>
+                    </div>
+
+                    <div class="stat-row">
+                        <label>VÉGTELEN LEGRÖVIDEBB IDŐ</label>
+                        <span id="stat-minTime" class="stat-value cyan-text">00:00</span>
                     </div>
 
                     <div class="stat-row">
