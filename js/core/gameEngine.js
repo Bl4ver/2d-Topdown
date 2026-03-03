@@ -36,19 +36,20 @@ export class GameEngine {
     // --- JÁTÉK INDÍTÁSA ---
     async start() {
         try {
-            // 1. JSON beolvasása
+            // 1. JSON beolvasása - IDE KELL AZ await, hogy megvárja a letöltést!
             this.datas = await this.loadDatas();
 
-            // 2. Alapállapot beállítása a JSON-ből
+            // 2. Alapállapot beállítása a JSON-ből (Most már biztosan van adat a this.datas-ban)
             this.state = JSON.parse(JSON.stringify(this.datas.state));
 
-            // 3. Mentés betöltése (ez felülírja az alapállapotot, ahol kell)
+            // 3. Mentés betöltése
             this.load();
 
             // 4. Többi rendszer indítása
             this.input.init();
             this.audio.init();
             this.changeScene('menu');
+
             requestAnimationFrame((t) => this.loop(t));
         } catch (e) {
             console.error("Betöltési hiba:", e);
@@ -65,11 +66,18 @@ export class GameEngine {
     }
 
     loop(timestamp) {
+        // Delta idő számítása (dt)
         const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1);
         this.lastTime = timestamp;
-        if (this.currentScene?.update) this.currentScene.update(this.input, dt);
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        if (this.currentScene?.draw) this.currentScene.draw(this.ctx);
+
+        // Csak a jelenlegi scene frissítése és rajzolása
+        if (this.currentScene) {
+            if (this.currentScene.update) this.currentScene.update(this.input, dt);
+
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            if (this.currentScene.draw) this.currentScene.draw(this.ctx);
+        }
+
         requestAnimationFrame((t) => this.loop(t));
     }
 
