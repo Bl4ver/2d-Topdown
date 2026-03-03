@@ -13,7 +13,7 @@ export class GameEngine {
         this.canvas = document.getElementById("gameCanvas");
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        this.datas = null; // Ide jön majd a datas.json tartalma
+        this.datas = null; // Ide jön a datas.json tartalma
 
         this.ctx = this.canvas.getContext("2d");
 
@@ -35,7 +35,6 @@ export class GameEngine {
 
     // --- JÁTÉK INDÍTÁSA ---
     async start() {
-        try {
             // 1. JSON beolvasása
             const response = await fetch("../../assets/datas.json");
             this.datas = await response.json();
@@ -51,9 +50,7 @@ export class GameEngine {
             this.audio.init();
             this.changeScene('menu');
             requestAnimationFrame((t) => this.loop(t));
-        } catch (e) {
-            console.error("Betöltési hiba:", e);
-        }
+        } 
     }
 
     loop(timestamp) {
