@@ -35,48 +35,33 @@ export class GameEngine {
 
     // --- JÁTÉK INDÍTÁSA ---
     async start() {
-        console.log("Játék inicializálása...");
         try {
-            this.datas = await this.loadDatas();
-
-            // Alapértékek betöltése
+            // 1. JSON beolvasása
+            const response = await fetch("../../assets/datas.json");
+            this.datas = await response.json();
+            
+            // 2. Alapállapot beállítása a JSON-ből
             this.state = JSON.parse(JSON.stringify(this.datas.state));
 
-            // Biztosítjuk, hogy minden fegyvernek megvan a "levels" objektuma
-            for (let weaponId in this.datas.weapons) {
-                if (!this.state.inventory.weapons[weaponId]) {
-                    this.state.inventory.weapons[weaponId] = { unlocked: false, levels: {} };
-                }
-                const weaponState = this.state.inventory.weapons[weaponId];
-                if (!weaponState.levels) weaponState.levels = {};
-
-                // Beállítjuk az 1-es szintet minden statra, ha még nem létezne
-                ['damage', 'fireRate', 'projectileSpeed', 'accuracy'].forEach(stat => {
-                    if (weaponState.levels[stat] === undefined) {
-                        weaponState.levels[stat] = 1;
-                    }
-                });
-            }
-
+            // 3. Mentés betöltése (ez felülírja az alapállapotot, ahol kell)
             this.load();
+
+            // 4. Többi rendszer indítása
+            this.input.init();
+            this.audio.init();
             this.changeScene('menu');
-            requestAnimationFrame((timestamp) => this.loop(timestamp));
-        } catch (error) {
-            console.error("Kritikus hiba:", error);
+            requestAnimationFrame((t) => this.loop(t));
+        } catch (e) {
+            console.error("Betöltési hiba:", e);
         }
     }
 
-    // GameEngine.js - Csak az érintett rész:
     loop(timestamp) {
-        if (!this.lastTime) this.lastTime = timestamp;
-        const deltaTime = (timestamp - this.lastTime) / 1000;
+        const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1);
         this.lastTime = timestamp;
-
-        const dt = Math.min(deltaTime, 0.1);
-
-        this.update(dt);
-        this.draw();
-
+        if (this.currentScene?.update) this.currentScene.update(this.input, dt);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (this.currentScene?.draw) this.currentScene.draw(this.ctx);
         requestAnimationFrame((t) => this.loop(t));
     }
 
@@ -94,31 +79,19 @@ export class GameEngine {
     }
 
     // --- JELENET KEZELÉS ---
-    changeScene(sceneName) {
-        let nextScene = null;
-
-        if (sceneName === "back") {
-            if (this.previousSceneName) {
-                this.changeScene(this.previousSceneName);
-            }
-            return;
-        }
-
-        switch (sceneName) {
-            case 'menu': nextScene = new MenuScene(this); break;
-            case 'game': nextScene = new GameScene(this); break;
-            case 'upgrades': nextScene = new UpgradeScene(this); break;
-            case 'statistics': nextScene = new StatisticsScene(this); break;
-            case 'encyclopedia': nextScene = new EncyclopediaScene(this); break;
-            case 'settings': nextScene = new SettingsScene(this); break;
-            default: console.warn(`Ismeretlen jelenet: ${sceneName}`); return;
-        }
-
-        if (nextScene) {
+    changeScene(name) {
+        const scenes = {
+            menu: MenuScene,
+            game: GameScene,
+            upgrades: UpgradeScene,
+            statistics: StatisticsScene
+        };
+        if (name === "back") return this.changeScene(this.previousSceneName);
+        if (scenes[name]) {
             this.previousSceneName = this.currentSceneName;
-            this.currentSceneName = sceneName;
-            this.setScene(nextScene);
-            console.log(`[Scene Váltás] ${this.previousSceneName || 'Start'} -> ${sceneName}`);
+            this.currentSceneName = name;
+            this.currentScene = new scenes[name](this);
+            this.currentScene.init(this.state);
         }
     }
 
@@ -135,57 +108,26 @@ export class GameEngine {
     }
 
     // --- ADATKEZELÉS ---
-    async loadDatas() {
-        let response = await fetch("../../assets/datas.json");
-        if (!response.ok) throw new Error(`HTTP hiba: ${response.status}`);
-        return await response.json();
-    }
-
     load() {
-        try {
-            const localSave = localStorage.getItem("neonO-save");
-            if (localSave) {
-                const parsedSave = JSON.parse(localSave);
+        const localSave = localStorage.getItem("neonO-save");
+        if (localSave) {
+            const parsedSave = JSON.parse(localSave);
 
-                this.state = {
-                    ...this.state, // Ez az alap a datas.json-ből
-                    ...parsedSave, // Ezt ráöntjük
-
-                    // És itt fésüljük össze a mélyebb szinteket biztonságosan:
-                    settings: { ...this.state.settings, ...(parsedSave.settings || {}) },
-                    player: { ...this.state.player, ...(parsedSave.player || {}) },
-                    upgrades: { ...this.state.upgrades, ...(parsedSave.upgrades || {}) },
-                    statistics: { ...this.state.statistics, ...(parsedSave.statistics || {}) },
-                    encyclopedia: { ...this.state.encyclopedia, ...(parsedSave.encyclopedia || {}) },
-
-                    inventory: {
-                        ...this.state.inventory,
-                        ...(parsedSave.inventory || {}),
-                        weapons: {
-                            ...this.state.inventory.weapons,
-                            // A KULCS: A kérdőjel (?.), ami megakadályozza az összeomlást!
-                            ...(parsedSave.inventory?.weapons || {})
-                        }
+            // Biztonságos összefésülés, hogy ne legyen 'undefined' hiba
+            this.state = {
+                ...this.state,
+                ...parsedSave,
+                inventory: {
+                    ...this.state.inventory,
+                    ...(parsedSave.inventory || {}),
+                    weapons: {
+                        ...this.state.inventory.weapons,
+                        ...(parsedSave.inventory?.weapons || {})
                     }
-                };
-
-                console.log("Játékállás sikeresen betöltve!", this.state);
-            } else {
-                console.log("Nem található korábbi mentés, új profil inicializálása...");
-            }
-        } catch (error) {
-            console.error("Hiba a mentés betöltésekor. Alapértékek használata.", error);
-        }
-
-        this.save();
-    }
-
-    save() {
-        try {
-            const stateString = JSON.stringify(this.state);
-            localStorage.setItem("neonO-save", stateString);
-        } catch (error) {
-            console.error("Hiba történt a mentés során:", error);
+                }
+            };
         }
     }
+
+    save() { localStorage.setItem("neonO-save", JSON.stringify(this.state)); }
 }

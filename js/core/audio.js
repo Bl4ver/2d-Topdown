@@ -11,21 +11,33 @@ export class Audio {
             hit: () => this.playSoundEffect(150, 'sawtooth', 0.1, 0.06, false),
             explosion: () => this.playSoundEffect(80, 'sawtooth', 0.4, 0.12),
             die: () => {
-                this.playSoundEffect(150, 'square', 0.15, 0.15); 
+                this.playSoundEffect(150, 'square', 0.15, 0.15);
                 setTimeout(() => this.playSoundEffect(60, 'sawtooth', 0.5, 0.2), 40);
             },
-            dieEnemy: () => { 
+            dieEnemy: () => {
                 this.playSoundEffect(120, 'square', 0.1, 0.5);
                 setTimeout(() => this.playSoundEffect(80, 'sawtooth', 0.1, 0.6), 50);
                 setTimeout(() => this.playSoundEffect(50, 'sawtooth', 0.1, 0.4), 120);
                 setTimeout(() => this.playSoundEffect(30, 'square', 0.2, 0.2), 250);
             },
-            pickup: () => { 
-                this.playSoundEffect(800, 'sine', 0.15, 0.08); 
-                // JAVÍTVA: playS helyett this.playSoundEffect
-                setTimeout(() => this.playSoundEffect(1200, 'sine', 0.15, 0.08), 40); 
+            pickup: () => {
+                this.playSoundEffect(800, 'sine', 0.15, 0.08);
+                setTimeout(() => this.playSoundEffect(1200, 'sine', 0.15, 0.08), 40);
             },
-            upgrade: () => this.playSoundEffect(600, 'sine', 0.5, 0.1)
+            unlock: () => this.playSoundEffect(600, 'sine', 0.5, 0.1),
+            upgrade: () => {
+                this.playSoundEffect(500, 'sine', 0.05, 0.2, false);
+                setTimeout(() => this.playSoundEffect(800, 'sine', 0.1, 0.2, false), 50);
+            },
+            equip: () => {
+                this.playSoundEffect(200, 'square', 0.05, 0.1, false);
+                setTimeout(() => this.playSoundEffect(100, 'square', 0.05, 0.1, false), 30);
+            },
+            levelUp: () => {
+                this.playSoundEffect(400, 'sine', 0.1, 0.2, false);
+                setTimeout(() => this.playSoundEffect(600, 'sine', 0.1, 0.2, false), 100);
+                setTimeout(() => this.playSoundEffect(800, 'sine', 0.4, 0.3, false), 200);
+            }
         };
     }
 
