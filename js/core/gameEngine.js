@@ -35,10 +35,10 @@ export class GameEngine {
 
     // --- JÁTÉK INDÍTÁSA ---
     async start() {
+        try {
             // 1. JSON beolvasása
-            const response = await fetch("../../assets/datas.json");
-            this.datas = await response.json();
-            
+            this.datas = this.loadDatas();
+
             // 2. Alapállapot beállítása a JSON-ből
             this.state = JSON.parse(JSON.stringify(this.datas.state));
 
@@ -50,7 +50,18 @@ export class GameEngine {
             this.audio.init();
             this.changeScene('menu');
             requestAnimationFrame((t) => this.loop(t));
-        } 
+        } catch (e) {
+            console.error("Betöltési hiba:", e);
+        }
+    }
+
+    async loadDatas() {
+        let response = await fetch("./assets/datas.json");
+
+        if (!response.ok) {
+            throw new Error(`Hiba! Status: ${response.status} - Ellenőrizd az útvonalat!`);
+        }
+        return await response.json();
     }
 
     loop(timestamp) {
