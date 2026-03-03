@@ -56,10 +56,10 @@ export class GameEngine {
     }
 
     async loadDatas() {
-        let response = await fetch("./assets/datas.json");
+        let response = await fetch("assets/datas.json");
 
         if (!response.ok) {
-            throw new Error(`Hiba! Status: ${response.status} - Ellenőrizd az útvonalat!`);
+            throw new Error(`Hiba! Status: ${response.status} - Útvonal: ${response.url}`);
         }
         return await response.json();
     }
