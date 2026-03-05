@@ -13,10 +13,10 @@ export class GameEngine {
         this.canvas = document.getElementById("gameCanvas");
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        this.datas = null; // Ide jön a datas.json tartalma
 
         this.ctx = this.canvas.getContext("2d");
 
+        this.datas = null; // Ide jön a datas.json tartalma
         this.state = null;
 
         this.lastTime = 0;
@@ -39,7 +39,7 @@ export class GameEngine {
             // 1. JSON beolvasása - IDE KELL AZ await, hogy megvárja a letöltést!
             this.datas = await this.loadDatas();
 
-            // 2. Alapállapot beállítása a JSON-ből (Most már biztosan van adat a this.datas-ban)
+            // 2. Alapállapot beállítása a JSON-ből
             this.state = JSON.parse(JSON.stringify(this.datas.state));
 
             // 3. Mentés betöltése
@@ -126,10 +126,11 @@ export class GameEngine {
     // --- ADATKEZELÉS ---
     load() {
         const localSave = localStorage.getItem("neonO-save");
+        console.log(localSave)
         if (localSave) {
             const parsedSave = JSON.parse(localSave);
 
-            // Mély összefésülés (Deep Merge), hogy semmi ne legyen undefined
+            // Mély összefésülés (Deep Merge)
             this.state = {
                 ...this.state,          // Alapértékek a JSON-ből
                 ...parsedSave,          // Globális értékek (coins, highScore, stb.)
@@ -165,6 +166,11 @@ export class GameEngine {
                 }
             };
             console.log("Mentés sikeresen betöltve:", this.state);
+            console.log(this.datas)
+        }
+        else{
+            this.state = this.datas.state
+            console.log(this.state)
         }
     }
 

@@ -135,6 +135,7 @@ export class Enemy {
 
             this.x += speedX * dt;
             this.y += speedY * dt;
+            this.color
         }
     }
 

@@ -29,10 +29,11 @@ export class Player {
     }
 
     init(state, datas) {
-        this.maxHp = state.player.maxHp;
+        this.maxHp = state.player.maxHp * datas.playerUpgrades.maxHp.inc;
         this.hp = this.maxHp;
-        this.speed = state.player.speed;
-        this.maxShield = Math.max(0, (state.player.maxShield) * datas.playerUpgrades.maxShield.inc); // NEM FIX
+        this.speed = state.player.speed * datas.playerUpgrades.speed.inc;
+        console.log(state.player.speed, datas.playerUpgrades.speed.inc)
+        this.maxShield = (state.player.maxShield) * datas.playerUpgrades.maxShield.inc; // NEM FIX
         this.shield = this.maxShield;
         this.shieldRegen = (state.player.shieldRegen) * datas.playerUpgrades.shieldRegen.inc;
         this.updateUI();
@@ -79,7 +80,6 @@ export class Player {
         if (input.keys.w || input.keys.ArrowUp) this.y -= step;
         if (input.keys.s || input.keys.ArrowDown) this.y += step;
 
-            console.log(this.shield, this.maxShield)
         // PAJZS REGEN: Időalapú visszatöltés
         if (this.shield < this.maxShield) {
             this.shield += this.shieldRegen * dt;

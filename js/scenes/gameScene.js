@@ -11,6 +11,7 @@ export class GameScene {
         this.physics = new Physics();
         this.input = engine.input;
         this.datas = engine.datas;
+        this.state = engine.state;
 
         // Objektum poolok és entitások
         this.bulletPool = new ObjectPool(Bullet, 200, this);
@@ -39,7 +40,7 @@ export class GameScene {
     init() {
         this.engine.uiManager.showScreen("hud");
 
-        this.player.init(this.engine.state, this.datas);
+        this.player.init(this.state, this.datas);
         this.player.spawn();
         this.player.active = true;
         this.player.hp = this.player.maxHp;
@@ -156,7 +157,7 @@ export class GameScene {
             case 5:
                 if (!this.bossFight) { this.bossFight = true; return "boss" }      // 100% első alkalomra
                 if (r > 0.8) return "guard";                    // 20%
-                this.minSpawnInterval = 30;
+                this.minSpawnInterval = 20;
                 return "elite";                                 // 80%
             case 6:
                 this.bossFight = false;

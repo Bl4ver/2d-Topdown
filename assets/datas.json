@@ -147,7 +147,7 @@
                     "name": "Sebzés"
                 },
                 "fireRate": {
-                    "inc": -100,
+                    "inc": -100,   
                     "baseCost": 300,
                     "name": "Tűzgyorsaság"
                 },
@@ -195,8 +195,8 @@
             "musicVolume": 100
         },
         "player": {
-            "maxHp": 1,
-            "speed": 1,
+            "maxHp": 10,
+            "speed": 20,
             "maxShield": 1,
             "shieldRegen": 1
         },
