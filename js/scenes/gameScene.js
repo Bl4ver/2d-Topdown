@@ -1,5 +1,6 @@
 // gameScene.js
 import { Player } from "../entities/player.js";
+import { Bot } from "../entities/bot.js";
 import { Bullet } from '../entities/bullet.js';
 import { Enemy } from '../entities/enemy.js';
 import { ObjectPool } from "../core/objectPool.js";
@@ -18,6 +19,7 @@ export class GameScene {
         // Objektum poolok és entitások
         this.bulletPool = new ObjectPool(Bullet, 200, this);
         this.enemyPool = new ObjectPool(Enemy, 200, this);
+        this.botPool = new ObjectPool(Bot, 10, this);
         this.player = new Player(this);
 
         // Run statisztikák
@@ -41,7 +43,9 @@ export class GameScene {
 
     init() {
         this.engine.uiManager.showScreen("hud");
-
+        this.engine.uiManager.bindButtonEvents({
+            onPause: () => this.engine.changeScene('menu')
+        });
         this.player.init(this.state, this.datas);
         this.player.spawn();
         this.player.active = true;
@@ -50,6 +54,17 @@ export class GameScene {
         let hpText = document.getElementById("hp-val");
         if (hpDisplay) hpDisplay.style.width = "100%";
         if (hpText) hpText.innerText = "100%";
+
+
+
+        let bot = this.botPool.get();
+        bot.init("repair_bot", this.state, this.datas);
+
+        /*
+        Object.keys(this.state.inventory.bots).forEach(bot => {
+            bot.init(bot, this.state, this.datas)
+        });
+        */
 
 
         this.runTime = 0;
@@ -95,6 +110,7 @@ export class GameScene {
             this.updateTimerUI();
 
             this.player.update(input, dt);
+            this.botPool.updateAll(dt);
             this.bulletPool.updateAll(dt);
             this.enemyPool.updateAll(dt);
 
@@ -271,6 +287,7 @@ export class GameScene {
 
     draw(ctx) {
         this.engine.renderer.renderPlayer(this.player);
+        this.botPool.pool.forEach(bot => this.engine.renderer.renderBot(bot));
         this.enemyPool.pool.forEach(enemy => this.engine.renderer.renderEnemy(enemy));
         this.bulletPool.pool.forEach(bullet => this.engine.renderer.renderBullet(bullet));
 

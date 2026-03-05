@@ -120,7 +120,6 @@ export class Enemy {
 
     update(dt) {
         if (!this.active) return;
-        console.log("ENEMY HP: ", this.hp)
 
         // Ha éppen robban, CSÜK a részecskéket mozgatjuk, az ellenséget már nem
         if (this.exploding) {

@@ -32,7 +32,6 @@ export class Player {
         this.maxHp = state.player.maxHp * datas.playerUpgrades.maxHp.inc;
         this.hp = this.maxHp;
         this.speed = state.player.speed * datas.playerUpgrades.speed.inc;
-        console.log(state.player.speed, datas.playerUpgrades.speed.inc)
         this.maxShield = (state.player.maxShield) * datas.playerUpgrades.maxShield.inc; // NEM FIX
         this.shield = this.maxShield;
         this.shieldRegen = (state.player.shieldRegen) * datas.playerUpgrades.shieldRegen.inc;
@@ -71,7 +70,6 @@ export class Player {
 
     update(input, dt) {
         if (!this.active) return;
-        console.log(this.hp)
 
         const step = this.speed * dt;
 

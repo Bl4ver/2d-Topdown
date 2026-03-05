@@ -40,6 +40,36 @@ export class Renderer {
         ctx.restore();
     }
 
+    renderBot(bot) {
+        if (!bot.active) return;
+        const ctx = this.ctx;
+
+        ctx.save();
+        ctx.translate(bot.x, bot.y);
+
+        const botColor = bot.color || "#00ff00"; // Alapértelmezett szín, ha nincs megadva
+
+        ctx.lineWidth = 3;
+
+        // Halványodik, ha sérül
+        const hpRatio = bot.maxHp > 0 ? (bot.hp / bot.maxHp) : 1;
+        ctx.globalAlpha = Math.max(0, hpRatio);
+
+        // Neon effekt (árnyék)
+        ctx.shadowColor = botColor;
+        ctx.shadowBlur = 15;
+
+        // Csak egy egyszerű, tiszta kör rajzolása
+        ctx.beginPath();
+        ctx.arc(0, 0, bot.radius || 15, 0, Math.PI * 2);
+
+        // Körvonal kirajzolása
+        ctx.strokeStyle = botColor;
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
     renderEnemy(enemy) {
         if (!enemy.active) return;
         const ctx = this.ctx;

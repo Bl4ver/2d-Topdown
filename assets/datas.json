@@ -147,7 +147,7 @@
                     "name": "Sebzés"
                 },
                 "fireRate": {
-                    "inc": -100,   
+                    "inc": -100,
                     "baseCost": 300,
                     "name": "Tűzgyorsaság"
                 },
@@ -160,6 +160,72 @@
                     "inc": -0.05,
                     "baseCost": 200,
                     "name": "Pontosság"
+                }
+            }
+        }
+    },
+    "bots": {
+        "repair_bot": {
+            "unlockCost": 1000,
+            "upgrades": {
+                "maxHp": {
+                    "name": "Maximális életerő",
+                    "baseValue": 100,
+                    "baseCost": 150,
+                    "inc": 20
+                },
+                "speed": {
+                    "name": "Mozgási sebesség",
+                    "baseValue": 150,
+                    "baseCost": 200,
+                    "inc": 10
+                },
+                "heal": {
+                    "name": "Gyógyítás ereje",
+                    "baseValue": 5,
+                    "baseCost": 200,
+                    "inc": 10
+                },
+                "healRate": {
+                    "name": "Gyógyítási ráta",
+                    "baseValue": 2,
+                    "baseCost": 200,
+                    "inc": 10
+                }
+            }
+        },
+        "shooter_bot": {
+            "unlockCost": 1000,
+            "upgrades": {
+                "maxHp": {
+                    "name": "Maximális életerő",
+                    "baseValue": 100,
+                    "baseCost": 150,
+                    "inc": 20
+                },
+                "speed": {
+                    "name": "Mozgási sebesség",
+                    "baseValue": 150,
+                    "baseCost": 200,
+                    "inc": 10
+                },
+                "damage": {
+                    "name": "Sebzés",
+                    "baseValue": 10,
+                    "baseCost": 200,
+                    "inc": 10
+                },
+                "firerate": {
+                    "name": "Lövési ráta",
+                    "baseValue": 500,
+                    "baseCost": 200,
+                    "inc": -20
+                },
+                "projectileSpeed": {
+                    "name": "Lövedék Sebesség",
+                    "baseValue": 600,
+                    "baseCost": 200,
+                    "inc": 50
                 }
             }
         }
@@ -187,7 +253,7 @@
         }
     },
     "state": {
-        "coins": 0,
+        "coins": 1000000,
         "highScore": 0,
         "settings": {
             "volume": 50,
@@ -213,6 +279,7 @@
         },
         "inventory": {
             "activeWeapon": "pistol",
+            "activeBots": [],
             "weapons": {
                 "pistol": {
                     "unlocked": true,
@@ -245,11 +312,22 @@
             "bots": {
                 "repair_bot": {
                     "unlocked": false,
-                    "level": 1
+                    "levels": {
+                        "maxHp": 1,
+                        "speed": 1,
+                        "heal": 1,
+                        "healRate": 1
+                    }
                 },
-                "attack_bot": {
+                "shooter_bot": {
                     "unlocked": false,
-                    "level": 1
+                    "levels": {
+                        "maxHp": 1,
+                        "speed": 1,
+                        "damage": 1,
+                        "firerate": 1,
+                        "projectileSpeed": 1
+                    }
                 }
             }
         }

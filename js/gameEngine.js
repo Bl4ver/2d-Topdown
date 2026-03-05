@@ -128,7 +128,6 @@ export class GameEngine {
     // --- ADATKEZELÉS ---
     load() {
         const localSave = localStorage.getItem("neonO-save");
-        console.log(localSave)
         if (localSave) {
             const parsedSave = JSON.parse(localSave);
 
@@ -162,19 +161,20 @@ export class GameEngine {
 
                     // Botok unlock állapota és szintjei
                     bots: {
+                        ...this.state.activeBots,
+                        ...(parsedSave.activeBots || {}),
                         ...this.state.inventory.bots,
                         ...(parsedSave.inventory?.bots || {})
                     }
                 }
             };
             console.log("Mentés sikeresen betöltve:", this.state);
-            console.log(this.datas)
         }
-        else{
+        else {
             this.state = this.datas.state
             console.log(this.state)
         }
     }
 
-    save() { localStorage.setItem("neonO-save", JSON.stringify(this.state)); }
+    save() { /*localStorage.setItem("neonO-save", JSON.stringify(this.state)); */ }
 }
