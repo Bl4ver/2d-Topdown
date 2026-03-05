@@ -213,16 +213,18 @@ export class GameScene {
             if (!bullet.active) return;
 
             this.enemyPool.pool.forEach(enemy => {
-                if (!enemy.active && enemy.exploding) return;
-
-                if (this.physics.checkCollision(bullet, enemy)) {
-                    if (bullet.type === "homing") {
-                        this.triggerExplosion(bullet);
-                    } else {
-                        enemy.takeDamage(bullet.damage);
+                if (enemy.active && !enemy.exploding) {
+                    if (this.physics.checkCollision(bullet, enemy)) {
+                        if (bullet.type === "homing") {
+                            this.triggerExplosion(bullet);
+                        } else {
+                            enemy.takeDamage(bullet.damage);
+                        }
+                        bullet.active = false;
                     }
-                    bullet.active = false;
                 }
+
+
             });
         });
 
