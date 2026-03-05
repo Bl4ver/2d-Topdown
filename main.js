@@ -1,4 +1,4 @@
-import { GameEngine } from "./js/core/gameEngine.js";
+import { GameEngine } from "./js/gameEngine.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     let gameEngine = new GameEngine();

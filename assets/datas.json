@@ -195,7 +195,7 @@
             "musicVolume": 100
         },
         "player": {
-            "maxHp": 10,
+            "maxHp": 5,
             "speed": 20,
             "maxShield": 1,
             "shieldRegen": 1
