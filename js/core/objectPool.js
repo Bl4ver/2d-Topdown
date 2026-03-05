@@ -32,14 +32,6 @@ export class ObjectPool {
         });
     }
 
-    drawAll() {
-        this.pool.forEach(object => {
-            if (object.active) {
-                object.draw();
-            }
-        });
-    }
-
     // Itt nem töröljük le az objektumokat, csak láthatatlanná tesszük őket a ciklusnak
     releaseAll() {
         // Pl. szintváltáskor az összeset inaktívra tesszük

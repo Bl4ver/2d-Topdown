@@ -101,35 +101,4 @@ export class Bullet {
             this.speedY = Math.sin(currentAngle) * this.speed;
         }
     }
-
-    draw() {
-        if (!this.active) return;
-
-        // JAVÍTVA: Rakéta design
-        this.ctx.save();
-        this.ctx.translate(this.x, this.y);
-
-        const angle = Math.atan2(this.speedY, this.speedX);
-        this.ctx.rotate(angle);
-
-        if (this.type === "homing") {
-            this.ctx.fillStyle = "#FFA500";
-            this.ctx.shadowBlur = 10;
-            this.ctx.shadowColor = "#FF4500";
-            this.ctx.beginPath();
-            this.ctx.moveTo(10, 0);
-            this.ctx.lineTo(-10, -5);
-            this.ctx.lineTo(-6, 0);
-            this.ctx.lineTo(-10, 5);
-            this.ctx.closePath();
-            this.ctx.fill();
-        } else {
-            this.ctx.fillStyle = "#00f3ff";
-            this.ctx.shadowBlur = 10;
-            this.ctx.shadowColor = "#00f3ff";
-            this.ctx.fillRect(-10, -2, 20, 4);
-        }
-
-        this.ctx.restore();
-    }
 }

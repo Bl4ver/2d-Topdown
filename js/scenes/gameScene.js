@@ -13,6 +13,8 @@ export class GameScene {
         this.datas = engine.datas;
         this.state = engine.state;
 
+        this.explosions = [];
+
         // Objektum poolok és entitások
         this.bulletPool = new ObjectPool(Bullet, 200, this);
         this.enemyPool = new ObjectPool(Enemy, 200, this);
@@ -27,7 +29,7 @@ export class GameScene {
         // Szintlépés beállításai
         this.level = 0;
         this.levelStartTime = 0;
-        // Ponthatárok: 1. szint: 20000, 2. szint: 50000, 3. szint: 100000
+        // Ponthatárok: 1. szint: 20000, 2. szint: 10000, 3. szint: 20000...
         this.scoreThresholds = [5000, 10000, 20000, 50000, 100000, 1000000];
 
         // Spawn menedzsment
@@ -97,6 +99,13 @@ export class GameScene {
             this.enemyPool.updateAll(dt);
 
             this.handleCollisions();
+
+            this.explosions.forEach(exp => {
+                exp.r += 300 * dt;
+                exp.alpha -= 1.5 * dt;
+            });
+
+            this.explosions = this.explosions.filter(exp => exp.alpha > 0);
         } else {
             this.finalizeStats();
             this.engine.changeScene("menu");
@@ -204,7 +213,7 @@ export class GameScene {
             if (!bullet.active) return;
 
             this.enemyPool.pool.forEach(enemy => {
-                if (!enemy.active) return;
+                if (!enemy.active && enemy.exploding) return;
 
                 if (this.physics.checkCollision(bullet, enemy)) {
                     if (bullet.type === "homing") {
@@ -219,37 +228,39 @@ export class GameScene {
 
         // --- B: Ellenségek vs Játékos ---
         this.enemyPool.pool.forEach(enemy => {
-            if (!enemy.active) return;
+            if (enemy.active && !enemy.exploding) {
 
-            if (this.physics.checkCollision(enemy, this.player)) {
-                // Itt maradhat az "ütközési" sebzés (pl. az enemy HP-ja vonódik le a játékostól)
-                this.player.takeDamage(enemy.hp);
-                enemy.die();
+                if (this.physics.checkCollision(enemy, this.player)) {
+                    // Itt maradhat az "ütközési" sebzés (pl. az enemy HP-ja vonódik le a játékostól)
+                    this.player.takeDamage(enemy.hp);
+                    enemy.die();
+                }
             }
         });
     }
 
     triggerExplosion(bullet) {
-        // 1. Hang lejátszása
         this.engine.audio.sfx.explosion();
 
-        // 2. Területi sebzés kiszámítása
         this.enemyPool.pool.forEach(enemy => {
             if (!enemy.active) return;
-
-            // Távolság négyzete a golyó és az ellenség között
             const dx = enemy.x - bullet.x;
             const dy = enemy.y - bullet.y;
             const distSq = dx * dx + dy * dy;
 
-            // Ha a robbanási sugáron belül van
-            if (distSq <= bullet.explosionRadius * bullet.explosionRadius) {
+            const radius = bullet.explosionRadius || 100;
+            if (distSq <= radius * radius) {
                 enemy.takeDamage(bullet.damage);
             }
         });
 
-        // 3. Vizuális effekt
-        this.createExplosionEffect(bullet.x, bullet.y, bullet.explosionRadius);
+        this.explosions.push({
+            x: bullet.x,
+            y: bullet.y,
+            r: 0,
+            maxR: bullet.explosionRadius || 100,
+            alpha: 1
+        });
     }
 
     createExplosionEffect(x, y, radius) {
@@ -257,23 +268,12 @@ export class GameScene {
     }
 
     draw(ctx) {
-        this.player.draw(ctx);
-        this.bulletPool.drawAll();
-        this.enemyPool.drawAll();
+        this.engine.renderer.renderPlayer(this.player);
+        this.enemyPool.pool.forEach(enemy => this.engine.renderer.renderEnemy(enemy));
+        this.bulletPool.pool.forEach(bullet => this.engine.renderer.renderBullet(bullet));
 
-        // Robbanás rajzolása ha van aktív effekt
-        if (this.explosionFlash && this.explosionFlash.alpha > 0) {
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(this.explosionFlash.x, this.explosionFlash.y, this.explosionFlash.r, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(255, 165, 0, ${this.explosionFlash.alpha})`;
-            ctx.lineWidth = 5;
-            ctx.stroke();
-            ctx.restore();
-
-            // Animáljuk: nő a sugár, tűnik el a szín
-            this.explosionFlash.r += 10;
-            this.explosionFlash.alpha -= 0.05;
-        }
+        this.explosions.forEach(exp => {
+            this.engine.renderer.renderExplosion(exp);
+        });
     }
 }

@@ -65,7 +65,7 @@
         <section id="main-menu" class="ui-screen hidden">
             <h1 class="title">NEON</h1>
             <h1 class="altTitle">Overdrive</h1>
-            <p class="description">- Cybercore Protocol: v1.0 -</p>
+            <p class="description">- Cybercore Protocol: v1.3 -</p>
             <div id="menu-buttons">
                 <button id="btn-start" class="button-menu">GAME MODES</button>
                 <button id="btn-upgrades" class="button-menu">UPGRADES</button>
@@ -106,7 +106,7 @@
         </section>
 
         <!-- MARK: Upgrade Screen -->
-        <section id="upgrades-screen" class="ui-screen hidden">
+        <section id="upgrades-screen" class="ui-screen hidden scrollable-screen">
             <h2>FEGYVERTÁR</h2>
 
             <div class="money-row">
@@ -114,16 +114,15 @@
                 <span id="upgrade-coins-val">0</span>
             </div>
 
-            <div class="upgrade-tabs">
+            <div class="tabs">
                 <button class="tab-btn active" data-target="playerUpgrades-container">JÁTÉKOS</button>
                 <button class="tab-btn" data-target="weapons-container">FEGYVEREK</button>
                 <button class="tab-btn" data-target="bots-container">BOTOK</button>
             </div>
 
-            <div id="playerUpgrades-container" class="upgrade-content active playerUpgrades-grid"></div>
-            <div id="weapons-container" class="upgrade-content weapons-grid"></div>
-            <div id="bots-container" class="upgrade-content bots-grid"></div>
-
+            <div id="playerUpgrades-container" class="tab-content active cards-grid"></div>
+            <div id="weapons-container" class="tab-content cards-grid"></div>
+            <div id="bots-container" class="tab-content cards-grid"></div>
 
             <button class="btn-back">VISSZA</button>
         </section>
@@ -171,10 +170,18 @@
         </section>
 
         <!-- MARK: Encyclopedia Screen -->
-        <section id="encyclopedia-screen" class="ui-screen hidden">
+        <section id="encyclopedia-screen" class="ui-screen hidden scrollable-screen">
             <h2>ENCYCLOPEDIA</h2>
-            <div id="enemiesInfo-container" class="info-content eneiemInfo-grid"></div>
-            <button class="btn-back">BACK</button>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-target="enemies-container">ELLENSÉGEK</button>
+                <button class="tab-btn" data-target="bosses-container">BOSSES</button>
+            </div>
+
+            <div id="enemies-container" class="tab-content active cards-grid"></div>
+            <div id="bosses-container" class="tab-content cards-grid"></div>
+
+            <button class="btn-back">VISSZA</button>
         </section>
 
     </div>

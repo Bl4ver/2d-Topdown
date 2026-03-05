@@ -49,7 +49,7 @@
             "width": 60,
             "height": 60,
             "radius": 60,
-            "scoreValue": 250,
+            "scoreValue": 750,
             "earnedCoin": 300,
             "rotationSpeed": 1,
             "color": "orange",

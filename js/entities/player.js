@@ -71,14 +71,23 @@ export class Player {
 
     update(input, dt) {
         if (!this.active) return;
+        console.log(this.hp)
 
         const step = this.speed * dt;
 
         // Mozgás
-        if (input.keys.a || input.keys.ArrowLeft) this.x -= step;
-        if (input.keys.d || input.keys.ArrowRight) this.x += step;
-        if (input.keys.w || input.keys.ArrowUp) this.y -= step;
-        if (input.keys.s || input.keys.ArrowDown) this.y += step;
+        if (input.keys.a || input.keys.ArrowLeft) {
+            this.x = Math.max(0, this.x - step);
+        }
+        if (input.keys.d || input.keys.ArrowRight) {
+            this.x = Math.min(this.canvas.width, this.x + step);
+        }
+        if (input.keys.w || input.keys.ArrowUp) {
+            this.y = Math.max(0, this.y - step);
+        }
+        if (input.keys.s || input.keys.ArrowDown) {
+            this.y = Math.min(this.canvas.height, this.y + step);
+        }
 
         // PAJZS REGEN: Időalapú visszatöltés
         if (this.shield < this.maxShield) {

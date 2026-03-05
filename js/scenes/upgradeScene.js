@@ -21,7 +21,7 @@ export class UpgradeScene {
                 btn.classList.add('active');
 
                 const target = btn.getAttribute('data-target');
-                document.querySelectorAll('.upgrade-content').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 document.getElementById(target).classList.add('active');
             };
         });
@@ -95,12 +95,14 @@ export class UpgradeScene {
         container.innerHTML = Object.entries(upgradesData).map(([key, data]) => {
             const lvl = this.engine.state.upgrades[key + "Level"] || 1;
             const cost = data.baseCost * lvl;
+            const value = data.inc
             const canAfford = this.engine.state.coins >= cost;
 
             return `
-                <div class="weapon-card">
+                <div class="card">
                     <h3>${data.name}</h3>
-                    <p>Szint: ${lvl}</p>
+                    <h4>Szint: ${lvl}</h4>
+                    <p>Add: ${value}</p>
                     <button class="${canAfford ? 'btn-buy' : 'btn-disabled'}" data-action="player-upg" data-key="${key}">
                         FEJLESZTÉS (${cost} ¤)
                     </button>
@@ -119,7 +121,7 @@ export class UpgradeScene {
 
             if (!state.unlocked) {
                 return `
-                    <div class="weapon-card">
+                    <div class="card">
                         <h3>${id.toUpperCase()}</h3>
                         <p>Ár: ${data.unlockCost} ¤</p>
                         <button class="${this.engine.state.coins >= data.unlockCost ? 'btn-buy' : 'btn-disabled'}" 
@@ -138,7 +140,7 @@ export class UpgradeScene {
             }).join('');
 
             return `
-                <div class="weapon-card">
+                <div class="card">
                     <h3>${id.toUpperCase()}</h3>
                     <button class="${isActive ? 'btn-equipped' : 'btn-equip'}" data-action="w-equip" data-id="${id}">
                         ${isActive ? 'FELSZERELVE' : 'FELSZEREL'}

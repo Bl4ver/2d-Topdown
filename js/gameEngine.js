@@ -1,6 +1,7 @@
 import { Input } from "./core/input.js";
 import { Audio } from "./core/audio.js";
 import { UIManager } from "./core/uiManager.js";
+import { Renderer } from "./core/renderer.js";
 import { GameScene } from "./scenes/gameScene.js";
 import { MenuScene } from "./scenes/menuScene.js";
 import { UpgradeScene } from "./scenes/upgradeScene.js";
@@ -27,6 +28,7 @@ export class GameEngine {
         this.input.init();
 
         this.uiManager = new UIManager();
+        this.renderer = new Renderer(this.canvas, this.ctx);
 
         this.currentSceneName = null;
         this.previousSceneName = null;
