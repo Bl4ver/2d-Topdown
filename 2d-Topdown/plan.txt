@@ -1,0 +1,26 @@
+/root
+├── index.html
+│   style.css
+├── /js
+│   ├── main.js             # Belépési pont (Init)
+│   ├── GameEngine.js       # A fő ciklus és jelenetkezelő
+│   ├── State.js            # Globális adatok (Pénz, Unlockok, Beállítások)
+│   ├── /core
+│   │   ├── Input.js        # Input kezelő
+│   │   ├── Renderer.js     # Csak a Canvas rajzolásért felel
+│   │   ├── Physics.js      # Ütközésvizsgálat (Collision)
+│   │   ├── AudioManager.js # Web Audio API kezelés
+│   │   ├── UIManager.js    # HTML DOM elemek elérése és manipulálása
+│   │   ├── Localization.js # Betölti a /assets/lang/ JSON fájljait
+│   │   └── ObjectPool.js   # Golyók és ellenségek raktára. Segít újrahasznosítani az objektumokat a "lag" elkerülése érdekében.
+│   ├── /scenes
+│   │   ├── MenuScene.js    # Főmenü logika
+│   │   ├── GameScene.js    # A konkrét játékmenet
+│   │   ├── UpgradeScene.js # Fejlesztések és Inventory
+│   │   └── Encyclopedia.js # Adatbázis megjelenítő
+│   └── /entities
+│       ├── Player.js       # Játékos osztály
+│       ├── Bot.js          # Botok és fegyvereik
+│       ├── Enemy.js        # Ellenség típusok
+│       └── Bullet.js       # Lövedék logika
+└── /assets                 # Hangok, json adatok
