@@ -56,9 +56,13 @@ export class GameScene {
         if (hpText) hpText.innerText = "100%";
 
 
-
-        let bot = this.botPool.get();
-        bot.init("repair_bot", this.state, this.datas);
+        console.log(this.state.inventory.activeBots)  // --> undifined
+        let temp = 0;
+        this.state.inventory.activeBots.forEach(active => {
+            console.log(temp)
+            temp++;
+            this.botPool.get().init(active, this.state, this.datas);
+        });
 
         /*
         Object.keys(this.state.inventory.bots).forEach(bot => {

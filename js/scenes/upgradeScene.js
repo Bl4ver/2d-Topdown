@@ -56,6 +56,7 @@ export class UpgradeScene {
                     this.engine.state.coins -= cost;
                     weaponState.levels[statKey]++;
                 }
+                break;
             }
 
             case "bot": {
@@ -65,8 +66,9 @@ export class UpgradeScene {
 
                 if (this.engine.state.coins >= cost) {
                     this.engine.state.coins -= cost;
-                    weaponState.levels[statKey]++;
+                    botState.levels[statKey]++;
                 }
+                break;
             }
         }
 
@@ -77,13 +79,15 @@ export class UpgradeScene {
     }
 
     unlock(id, type) {
+
+        console.log(SVGUnitTypes)
         switch (type) {
             case "weapon": {
                 const weapon = this.engine.datas.weapons[id];
                 if (this.engine.state.coins >= weapon.unlockCost) {
                     this.engine.state.coins -= weapon.unlockCost;
                     this.engine.state.inventory.weapons[id].unlocked = true;
-
+                    break;
                 }
             }
 
@@ -92,6 +96,7 @@ export class UpgradeScene {
                 if (this.engine.state.coins >= bot.unlockCost) {
                     this.engine.state.coins -= bot.unlockCost;
                     this.engine.state.inventory.bots[id].unlocked = true;
+                    break;
                 }
             }
         }
@@ -103,18 +108,19 @@ export class UpgradeScene {
     }
 
     equip(id, type) {
-        console.log(typeof(this.engine.state.inventory.activeBots))
         switch (type) {
             case "weapon": {
                 this.engine.state.inventory.activeWeapon = id;
-                console.log(this.engine.state.inventory.activeWeapon, "equipped")
+                console.log(this.engine.state.inventory.activeWeapon, "equipped");
+                break;
             }
             case "bot": {
-                if (this.engine.state.inventory.activeBots.includes(id)){
+                if (this.engine.state.inventory.activeBots.includes(id)) {
                     this.engine.state.inventory.activeBots = this.engine.state.inventory.activeBots.filter(botId => botId !== id);
-                    console.log("asD")
+
                 }
-                else this.engine.state.inventory.activeBots += id;
+                else this.engine.state.inventory.activeBots.push(id);
+                break;
             }
         }
 

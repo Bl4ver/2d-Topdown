@@ -215,9 +215,9 @@
                     "baseCost": 200,
                     "inc": 10
                 },
-                "firerate": {
+                "fireRate": {
                     "name": "Lövési ráta",
-                    "baseValue": 500,
+                    "baseValue": 1200,
                     "baseCost": 200,
                     "inc": -20
                 },
@@ -226,6 +226,17 @@
                     "baseValue": 600,
                     "baseCost": 200,
                     "inc": 50
+                },
+                "spread": {
+                    "name": "Lövedék Szórása",
+                    "baseValue": 10,
+                    "baseCost": 200,
+                    "inc": 1
+                },
+                "bulletType": {
+                    "name": "Lövedék típusa",
+                    "baseValue": "normal",
+                    "type": "normal"
                 }
             }
         }
@@ -325,8 +336,9 @@
                         "maxHp": 1,
                         "speed": 1,
                         "damage": 1,
-                        "firerate": 1,
-                        "projectileSpeed": 1
+                        "fireRate": 1,
+                        "projectileSpeed": 1,
+                        "spread": 1
                     }
                 }
             }

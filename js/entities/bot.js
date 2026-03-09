@@ -20,13 +20,13 @@ export class Bot {
         this.exploding = false;
         this.particles = [];
         this.name = "";
+        this.lastTime = 0;
 
         this.orbitAngle = 0;
     }
 
     init(botName, state, datas) {
         this.name = botName;
-
         const botData = datas.bots[botName].upgrades;
         const botInventory = state.inventory.bots[botName].levels;
 
@@ -44,7 +44,10 @@ export class Bot {
         if (botName === "shooter_bot") {
             this.damage = botData.damage.inc * botInventory.damage;
             this.fireRate = botData.fireRate.inc * botInventory.fireRate;
-            this.projectileSpeed = botData.projectileSpeed.inc * botInventory.projectileSpeed;
+            if (botInventory.projectileSpeed != 1) this.projectileSpeed = botData.projectileSpeed.inc * botInventory.projectileSpeed;
+            else this.projectileSpeed = botData.projectileSpeed.baseValue;
+            this.bulletType = botData.bulletType.type
+            this.spread = botData.spread.inc * -botInventory.spread;
             this.color = "#ff0055"; // Pirosas szín a harci botnak
         }
 
@@ -94,10 +97,78 @@ export class Bot {
         }
 
         // --- Később IDE jön majd a bot TÁMADÁSA vagy GYÓGYÍTÁSA ---
+        switch (this.name) {
+            case "shooter_bot": {
+                this.shoot();
+                break;
+            }
+            case "repair_bot": {
+                this.repair();
+                break;
+            }
+            default: {
+                console.log("Nem futott le semmi, bot neve: ", this.name)
+                break;
+            }
+        }
+    }
+
+    shoot() {
+        console.log(`${Math.max(10, this.fireRate)}`);
+        if (Date.now() - this.lastTime >= Math.max(10, this.fireRate)) {
+            console.log("shoot");
+            this.lastTime = Date.now();
+            const bullet = this.scene.bulletPool.get();
+            bullet.spawn(
+                this.x, this.y,
+                0, 0,
+                this.damage, this.projectileSpeed, this.bulletType, Math.max(0, this.spread)
+            );
+            this.engine.audio.sfx.shoot()
+        }
+        return;
+
+        /*
+        const inv = this.engine.state.inventory;
+        const weaponData = this.engine.datas.weapons[inv.activeWeapon];
+        const weaponSave = inv.weapons[inv.activeWeapon];
+
+        if (!weaponData || !weaponSave || !weaponSave.levels || !weaponData.upgrades) {
+            console.warn("Fegyver adatok hiányoznak vagy elavult mentés!");
+            return;
+        }
+
+        const currentTime = Date.now();
+        const lvl = weaponSave.levels;
+        const upg = weaponData.upgrades;
+
+        let fireRate = weaponData.baseFireRate + ((lvl.fireRate - 1) * upg.fireRate.inc);
+
+        if (currentTime - this.lastShotTime >= Math.max(10, fireRate)) {
+            this.lastShotTime = currentTime;
+
+            const dmg = weaponData.baseDamage + ((lvl.damage - 1) * upg.damage.inc);
+            const spd = weaponData.bulletSpeed + ((lvl.projectileSpeed - 1) * upg.projectileSpeed.inc);
+            let spread = weaponData.baseAccuracy + ((lvl.accuracy - 1) * upg.accuracy.inc);
+
+            const bullet = this.scene.bulletPool.get();
+            if (bullet) {
+                bullet.spawn(
+                );
+                this.engine.audio.sfx.shoot();
+            }
+        }
+        */
+    }
+
+    repair() {
+        if (this.lastTime - Date.now() <= this.healRate)
+            console.log("repair");
+        return;
     }
 
     // Egy egyszerű rajzoló funkció, hogy lássuk a pályán
     draw() {
-        
+
     }
 }
