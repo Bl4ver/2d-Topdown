@@ -220,16 +220,18 @@ export class UpgradeScene {
                                 data-action="b-unlock" data-id="${key}">FELOLDÁS</button>
                     </div>`;
             }
-            const statsHtml = Object.entries(value.upgrades).map(([sKey, sValue]) => {
-                const currentLevel = state.levels[sKey] || 1;
-                const cost = sValue.baseCost * state.levels[sKey];
-                return `
-                    <div class="upgrade-row">
-                        <span class="upgrade-label">${sKey} (Lv${currentLevel})</span>
-                        <button class="btn-upgrade-stat ${this.engine.state.coins >= cost ? 'btn-buy' : 'btn-disabled'}" 
-                                data-action="b-upg" data-id="${key}" data-stat="${sKey}">${cost} ¤</button>
-                    </div>`;
-            }).join('');
+            const statsHtml = Object.entries(value.upgrades)
+                .filter(([sKey, sValue]) => sValue.baseCost !== undefined)
+                .map(([sKey, sValue]) => {
+                    const currentLevel = state.levels[sKey] || 1;
+                    const cost = sValue.baseCost * currentLevel;
+                    return `
+                        <div class="upgrade-row">
+                            <span class="upgrade-label">${sKey} (Lv${currentLevel})</span>
+                            <button class="btn-upgrade-stat ${this.engine.state.coins >= cost ? 'btn-buy' : 'btn-disabled'}" 
+                                    data-action="b-upg" data-id="${key}" data-stat="${sKey}">${cost} ¤</button>
+                        </div>`;
+                }).join('');
 
             return `
                 <div class="card">

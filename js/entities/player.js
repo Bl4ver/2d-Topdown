@@ -1,5 +1,3 @@
-import { Bullet } from "./bullet.js";
-
 export class Player {
     constructor(scene) {
         this.scene = scene;
@@ -17,9 +15,17 @@ export class Player {
         this.shield = 0;
         this.shieldRegen = 0;
 
-        this.lastShotTime = 0;
+        this.shootTimer = 0;
+        this.damageCooldownTimer = 0;
         this.mouse = { x: 0, y: 0 };
         this.active = false;
+
+        this.ui = {
+            hpFill: null,
+            hpVal: null,
+            shieldFill: null,
+            shieldVal: null
+        };
 
         window.addEventListener('mousemove', (event) => {
             const rect = this.canvas.getBoundingClientRect();
@@ -29,12 +35,24 @@ export class Player {
     }
 
     init(state, datas) {
-        this.maxHp = state.player.maxHp * datas.playerUpgrades.maxHp.inc;
+        const getLvl = (key) => state.upgrades[key + "Level"] || 1; // Lekérjük a szintet
+        const upg = datas.playerUpgrades;
+        const base = state.player;
+
+
+        this.maxHp = base.maxHp + (upg.maxHp.inc * (getLvl("maxHp") - 1));
         this.hp = this.maxHp;
-        this.speed = state.player.speed * datas.playerUpgrades.speed.inc;
-        this.maxShield = (state.player.maxShield) * datas.playerUpgrades.maxShield.inc; // NEM FIX
+        this.speed = base.speed + (upg.speed.inc * (getLvl("speed") - 1));
+        this.maxShield = base.maxShield + (upg.maxShield.inc * (getLvl("maxShield") - 1));
         this.shield = this.maxShield;
-        this.shieldRegen = (state.player.shieldRegen) * datas.playerUpgrades.shieldRegen.inc;
+        this.shieldRegen = base.shieldRegen + (upg.shieldRegen.inc * (getLvl("shieldRegen") - 1));
+
+
+        this.ui.hpFill = document.getElementById("hp-fill");
+        this.ui.hpVal = document.getElementById("hp-val");
+        this.ui.shieldFill = document.getElementById("shield-fill");
+        this.ui.shieldVal = document.getElementById("shield-val");
+
         this.updateUI();
     }
 
@@ -64,6 +82,7 @@ export class Player {
             this.active = false;
             this.engine.audio.sfx.die();
         } else {
+            this.damageCooldownTimer = 3.0;
             this.engine.audio.sfx.hit();
         }
     }
@@ -72,6 +91,8 @@ export class Player {
         if (!this.active) return;
 
         const step = this.speed * dt;
+        if (this.shootTimer > 0) this.shootTimer -= dt;
+        if (this.damageCooldownTimer > 0) this.damageCooldownTimer -= dt;
 
         // Mozgás
         if (input.keys.a || input.keys.ArrowLeft) {
@@ -88,27 +109,23 @@ export class Player {
         }
 
         // PAJZS REGEN: Időalapú visszatöltés
-        if (this.shield < this.maxShield) {
+        if (this.shield < this.maxShield && this.damageCooldownTimer <= 0) {
             this.shield += this.shieldRegen * dt;
             if (this.shield > this.maxShield) this.shield = this.maxShield;
-            this.updateUI(); // Folyamatosan frissítjük a csíkot
+            this.updateUI(); 
         }
 
         if (input.isKeyDown("mouse")) this.shoot();
     }
 
     updateUI() {
-        // HP sáv
-        const hpFill = document.getElementById("hp-fill");
-        const hpVal = document.getElementById("hp-val");
-        if (hpFill) hpFill.style.width = (this.hp / this.maxHp * 100) + "%";
-        if (hpVal) hpVal.innerText = Math.max(0, Math.round(this.hp / this.maxHp * 100)) + "%";
+        // HP
+        if (this.ui.hpFill) this.ui.hpFill.style.width = (this.hp / this.maxHp * 100) + "%";
+        if (this.ui.hpVal) this.ui.hpVal.innerText = Math.max(0, Math.round(this.hp / this.maxHp * 100)) + "%";
 
-        // Pajzs sáv
-        const shieldFill = document.getElementById("shield-fill");
-        const shieldVal = document.getElementById("shield-val");
-        if (shieldFill) shieldFill.style.width = (this.shield / this.maxShield * 100) + "%";
-        if (shieldVal) shieldVal.innerText = Math.max(0, Math.round(this.shield / this.maxShield * 100)) + "%";
+        // Shield
+        if (this.ui.shieldFill) this.ui.shieldFill.style.width = (this.shield / this.maxShield * 100) + "%";
+        if (this.ui.shieldVal) this.ui.shieldVal.innerText = Math.max(0, Math.round(this.shield / this.maxShield * 100)) + "%";
     }
 
     shoot() {
@@ -125,10 +142,11 @@ export class Player {
         const lvl = weaponSave.levels;
         const upg = weaponData.upgrades;
 
-        let fireRate = weaponData.baseFireRate + ((lvl.fireRate - 1) * upg.fireRate.inc);
+        let fireRateMs = weaponData.baseFireRate + ((lvl.fireRate - 1) * upg.fireRate.inc);
+        let fireRateSec = fireRateMs / 1000;
 
-        if (currentTime - this.lastShotTime >= Math.max(10, fireRate)) {
-            this.lastShotTime = currentTime;
+        if (this.shootTimer <= 0) {
+            this.shootTimer = fireRateSec
 
             const dmg = weaponData.baseDamage + ((lvl.damage - 1) * upg.damage.inc);
             const spd = weaponData.bulletSpeed + ((lvl.projectileSpeed - 1) * upg.projectileSpeed.inc);
@@ -144,6 +162,12 @@ export class Player {
                 this.engine.audio.sfx.shoot();
             }
         }
+    }
+
+    heal(amount) {
+        this.hp = Math.min(this.hp + amount, this.maxHp);
+        console.log(this.hp)
+        this.updateUI();
     }
 
 

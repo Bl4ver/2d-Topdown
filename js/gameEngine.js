@@ -161,11 +161,11 @@ export class GameEngine {
 
                     // Botok unlock állapota és szintjei
                     bots: {
-                        ...this.state.activeBots,
-                        ...(parsedSave.activeBots || {}),
                         ...this.state.inventory.bots,
                         ...(parsedSave.inventory?.bots || {})
-                    }
+                    },
+
+                    activeBots: parsedSave.inventory?.activeBots || this.state.inventory.activeBots || []
                 }
             };
             console.log("Mentés sikeresen betöltve:", this.state);

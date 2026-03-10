@@ -14,15 +14,16 @@ export class Bot {
         this.maxHp = 0;
         this.damage = 0;
         this.speed = 0;
-        this.radius = 10; // Alap méret a botnak --> datas.json-hoz hozzá kellene adni
-        this.color = "#00f3ff"; // Alapértelmezett kék neon szín
+        this.radius = 0;
+        this.color = "";
 
         this.exploding = false;
         this.particles = [];
         this.name = "";
-        this.lastTime = 0;
 
         this.orbitAngle = 0;
+
+        this.shootTimer = 0;
     }
 
     init(botName, state, datas) {
@@ -35,30 +36,33 @@ export class Bot {
         }
 
 
-        // 1. KÖZÖS statisztikák betöltése (minden botnak van)
-        this.maxHp = botData.maxHp.inc * botInventory.maxHp;
+        const getStat = (key) => botData[key].baseValue + (botData[key].inc * (botInventory[key] - 1));
+        // 1. KÖZÖS statisztikák
+        this.maxHp = getStat("maxHp");
         this.hp = this.maxHp;
-        this.speed = Math.max(botData.speed.baseValue, botData.speed.inc * botInventory.speed); // MÁSHOL IS KELL A BASE VALUE              FONTOOOSSS
+        this.speed = getStat("speed");
 
-        // 2. SHOOTER BOT specifikus statisztikák
+        // 2. SHOOTER BOT
         if (botName === "shooter_bot") {
-            this.damage = botData.damage.inc * botInventory.damage;
-            this.fireRate = botData.fireRate.inc * botInventory.fireRate;
-            if (botInventory.projectileSpeed != 1) this.projectileSpeed = botData.projectileSpeed.inc * botInventory.projectileSpeed;
-            else this.projectileSpeed = botData.projectileSpeed.baseValue;
-            this.bulletType = botData.bulletType.type
-            this.spread = botData.spread.inc * -botInventory.spread;
-            this.color = "#ff0055"; // Pirosas szín a harci botnak
+            this.damage = getStat("damage");
+            this.fireRate = getStat("fireRate");
+            this.projectileSpeed = getStat("projectileSpeed");
+
+            this.spread = Math.max(0, getStat("spread"));
+
+            this.bulletType = botData.bulletType.baseValue;
+            this.color = "#ff0055";
+            this.shootTimer = 0;
         }
 
-        // 3. REPAIR BOT specifikus statisztikák
+        // 3. REPAIR BOT
         if (botName === "repair_bot") {
-            this.heal = botData.heal.inc * botInventory.heal;
-            this.healRate = botData.healRate.inc * botInventory.healRate;
-            this.color = "#39ff14"; // Zöld szín a gyógyító botnak
+            this.heal = getStat("heal");
+            this.healRate = getStat("healRate");
+            this.color = "#39ff14";
         }
 
-        // Spawnoláskor a játékos mellé tesszük
+        // Spawnoláskor a játékos mellé
         this.x = this.scene.player.x - 50;
         this.y = this.scene.player.y - 50;
 
@@ -67,15 +71,16 @@ export class Bot {
         this.particles = [];
     }
 
-    // Ide jön majd a mozgás, követés és a támadás/gyógyítás logikája
     update(dt) {
         if (!this.active) return;
 
-        // 1. Keringési célpont kiszámolása
-        this.orbitAngle += 2 * dt; // A keringés sebessége (növeld, ha gyorsabban pörögjön)
-        const orbitRadius = 70; // Milyen távol lebegjen a játékostól (pixelben)
+        // --- ÚJ: Timer csökkentése minden frame-ben ---
+        if (this.shootTimer > 0) this.shootTimer -= dt;
 
-        // Ide akarjuk küldeni a botot (a játékos pozíciója + a kör egy pontja)
+        // 1. Keringési célpont kiszámolása
+        this.orbitAngle += 2 * dt;
+        const orbitRadius = 70;
+
         const targetX = this.scene.player.x + Math.cos(this.orbitAngle) * orbitRadius;
         const targetY = this.scene.player.y + Math.sin(this.orbitAngle) * orbitRadius;
 
@@ -84,87 +89,61 @@ export class Bot {
         const dy = targetY - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // Ha messzebb van a céltól, mint 1 pixel, akkor mozog
         if (distance > 1) {
-            // Normalizáljuk az irányt, majd megszorozzuk a bot SEBESSÉGÉVEL
             const moveSpeed = this.speed * dt;
-
-            // Math.min: megakadályozza, hogy "túlrepüljön" a célon és remegni kezdjen
             const step = Math.min(moveSpeed, distance);
 
             this.x += (dx / distance) * step;
             this.y += (dy / distance) * step;
         }
 
-        // --- Később IDE jön majd a bot TÁMADÁSA vagy GYÓGYÍTÁSA ---
+        // Támadás vagy gyógyítás logikája
         switch (this.name) {
             case "shooter_bot": {
                 this.shoot();
                 break;
             }
             case "repair_bot": {
-                this.repair();
-                break;
-            }
-            default: {
-                console.log("Nem futott le semmi, bot neve: ", this.name)
+                this.repair(dt);
                 break;
             }
         }
     }
 
     shoot() {
-        console.log(`${Math.max(10, this.fireRate)}`);
-        if (Date.now() - this.lastTime >= Math.max(10, this.fireRate)) {
-            console.log("shoot");
-            this.lastTime = Date.now();
+        const fireRateSec = this.fireRate / 1000;
+
+        // JAVÍTVA: Date.now() helyett dt-alapú cooldown ellenőrzés
+        if (this.shootTimer <= 0) {
+            this.shootTimer = fireRateSec; // Visszaszámláló újraindítása
+
+            let target = null, minDist = Infinity;
+            this.scene.enemyPool.pool.forEach(e => {
+                if (!e.active) return;
+                const d = (e.x - this.x) ** 2 + (e.y - this.y) ** 2;
+                if (d < minDist) { minDist = d; target = e; }
+            });
+
+            if (!target) return;
+
             const bullet = this.scene.bulletPool.get();
             bullet.spawn(
                 this.x, this.y,
-                0, 0,
+                target.x - this.x, target.y - this.y,
                 this.damage, this.projectileSpeed, this.bulletType, Math.max(0, this.spread)
             );
-            this.engine.audio.sfx.shoot()
+            this.engine.audio.sfx.shoot();
         }
-        return;
-
-        /*
-        const inv = this.engine.state.inventory;
-        const weaponData = this.engine.datas.weapons[inv.activeWeapon];
-        const weaponSave = inv.weapons[inv.activeWeapon];
-
-        if (!weaponData || !weaponSave || !weaponSave.levels || !weaponData.upgrades) {
-            console.warn("Fegyver adatok hiányoznak vagy elavult mentés!");
-            return;
-        }
-
-        const currentTime = Date.now();
-        const lvl = weaponSave.levels;
-        const upg = weaponData.upgrades;
-
-        let fireRate = weaponData.baseFireRate + ((lvl.fireRate - 1) * upg.fireRate.inc);
-
-        if (currentTime - this.lastShotTime >= Math.max(10, fireRate)) {
-            this.lastShotTime = currentTime;
-
-            const dmg = weaponData.baseDamage + ((lvl.damage - 1) * upg.damage.inc);
-            const spd = weaponData.bulletSpeed + ((lvl.projectileSpeed - 1) * upg.projectileSpeed.inc);
-            let spread = weaponData.baseAccuracy + ((lvl.accuracy - 1) * upg.accuracy.inc);
-
-            const bullet = this.scene.bulletPool.get();
-            if (bullet) {
-                bullet.spawn(
-                );
-                this.engine.audio.sfx.shoot();
-            }
-        }
-        */
     }
 
-    repair() {
-        if (this.lastTime - Date.now() <= this.healRate)
-            console.log("repair");
-        return;
+    repair(dt) {
+        const player = this.scene.player;
+        if (player.damageCooldownTimer <= 0 && player.hp < player.maxHp) {
+
+            const healStep = (this.heal * dt) / this.healRate;
+
+            player.heal(healStep);
+        }
     }
 
     // Egy egyszerű rajzoló funkció, hogy lássuk a pályán

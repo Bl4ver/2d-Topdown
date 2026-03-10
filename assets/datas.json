@@ -190,7 +190,7 @@
                     "name": "Gyógyítási ráta",
                     "baseValue": 2,
                     "baseCost": 200,
-                    "inc": 10
+                    "inc": 1
                 }
             }
         },
@@ -261,6 +261,11 @@
             "name": "Shield regenerálódás",
             "baseCost": 200,
             "inc": 1
+        },
+        "regenDelay": {
+            "name": "Gyógyulási késleltetés (kevesebb a jobb)",
+            "baseCost": 200,
+            "inc": -0.2
         }
     },
     "state": {
@@ -275,11 +280,16 @@
             "maxHp": 5,
             "speed": 20,
             "maxShield": 1,
-            "shieldRegen": 1
+            "shieldRegen": 1,
+            "healCooldown": 1,
+            "regenDelay": 3.0
         },
         "upgrades": {
-            "hpLevel": 1,
-            "speedLevel": 1
+            "maxHpLevel": 1,
+            "speedLevel": 1,
+            "maxShieldLevel": 1,
+            "shieldRegenLevel": 1,
+            "regenDelayLevel": 1
         },
         "statistics": {
             "enemiesKilled": 0,
