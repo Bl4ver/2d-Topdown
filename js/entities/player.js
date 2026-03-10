@@ -35,23 +35,29 @@ export class Player {
     }
 
     init(state, datas) {
-        const getLvl = (key) => state.upgrades[key + "Level"] || 1; // Lekérjük a szintet
-        const upg = datas.playerUpgrades;
-        const base = state.player;
-
-
-        this.maxHp = base.maxHp + (upg.maxHp.inc * (getLvl("maxHp") - 1));
-        this.hp = this.maxHp;
-        this.speed = base.speed + (upg.speed.inc * (getLvl("speed") - 1));
-        this.maxShield = base.maxShield + (upg.maxShield.inc * (getLvl("maxShield") - 1));
-        this.shield = this.maxShield;
-        this.shieldRegen = base.shieldRegen + (upg.shieldRegen.inc * (getLvl("shieldRegen") - 1));
-
-
         this.ui.hpFill = document.getElementById("hp-fill");
         this.ui.hpVal = document.getElementById("hp-val");
         this.ui.shieldFill = document.getElementById("shield-fill");
         this.ui.shieldVal = document.getElementById("shield-val");
+
+        const getLvl = (key) => state.upgrades[key + "Level"] || 1; 
+        const upg = datas.playerUpgrades;
+
+        // EGYETLEN KÉPLET MINDENRE: Bázis + (Növekmény * (Szint - 1))
+        const getStat = (key) => upg[key].baseValue + (upg[key].inc * (getLvl(key) - 1));
+
+        this.maxHp = getStat("maxHp");
+        this.hp = this.maxHp;
+        
+        this.speed = getStat("speed");
+        
+        this.maxShield = getStat("maxShield");
+        this.shield = this.maxShield;
+        
+        this.shieldRegen = getStat("shieldRegen");
+        
+        let calcDelay = getStat("regenDelay");
+        this.regenDelayValue = Math.max(0.5, calcDelay); // Minimum 0.5mp cooldown
 
         this.updateUI();
     }
@@ -138,19 +144,21 @@ export class Player {
             return;
         }
 
-        const currentTime = Date.now();
         const lvl = weaponSave.levels;
         const upg = weaponData.upgrades;
 
-        let fireRateMs = weaponData.baseFireRate + ((lvl.fireRate - 1) * upg.fireRate.inc);
-        let fireRateSec = fireRateMs / 1000;
+        const getWepStat = (key) => upg[key].baseValue + (upg[key].inc * ((lvl[key] || 1) - 1));
 
+        // Tűzgyorsaság kiszámolása ms-ből másodpercre
+        let fireRateSec = getWepStat("fireRate") / 1000;
+
+        // dt alapú időzítő ellenőrzése
         if (this.shootTimer <= 0) {
-            this.shootTimer = fireRateSec
+            this.shootTimer = fireRateSec; // Visszaszámláló újraindítása
 
-            const dmg = weaponData.baseDamage + ((lvl.damage - 1) * upg.damage.inc);
-            const spd = weaponData.bulletSpeed + ((lvl.projectileSpeed - 1) * upg.projectileSpeed.inc);
-            let spread = weaponData.baseAccuracy + ((lvl.accuracy - 1) * upg.accuracy.inc);
+            const dmg = getWepStat("damage");
+            const spd = getWepStat("projectileSpeed");
+            let spread = getWepStat("accuracy");
 
             const bullet = this.scene.bulletPool.get();
             if (bullet) {
@@ -159,7 +167,10 @@ export class Player {
                     this.mouse.x - this.x, this.mouse.y - this.y,
                     dmg, spd, weaponData.type, Math.max(0, spread)
                 );
-                this.engine.audio.sfx.shoot();
+                
+                if (this.engine.audio && this.engine.audio.sfx) {
+                    this.engine.audio.sfx.shoot();
+                }
             }
         }
     }

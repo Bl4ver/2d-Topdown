@@ -74,28 +74,28 @@
     "weapons": {
         "pistol": {
             "type": "projectile",
-            "baseDamage": 10,
-            "baseFireRate": 400,
-            "bulletSpeed": 800,
-            "baseAccuracy": 0.15,
             "unlockCost": 0,
             "upgrades": {
                 "damage": {
+                    "baseValue": 10,
                     "inc": 2,
                     "baseCost": 50,
                     "name": "Sebzés"
                 },
                 "fireRate": {
+                    "baseValue": 400,
                     "inc": -20,
                     "baseCost": 80,
                     "name": "Tűzgyorsaság"
                 },
                 "projectileSpeed": {
+                    "baseValue": 800,
                     "inc": 100,
                     "baseCost": 40,
                     "name": "Lövedék Sebesség"
                 },
                 "accuracy": {
+                    "baseValue": 0.15,
                     "inc": -0.02,
                     "baseCost": 60,
                     "name": "Pontosság"
@@ -104,28 +104,28 @@
         },
         "machinegun": {
             "type": "projectile",
-            "baseDamage": 5,
-            "baseFireRate": 120,
-            "bulletSpeed": 1200,
-            "baseAccuracy": 0.3,
             "unlockCost": 500,
             "upgrades": {
                 "damage": {
+                    "baseValue": 5,
                     "inc": 1,
                     "baseCost": 100,
                     "name": "Sebzés"
                 },
                 "fireRate": {
+                    "baseValue": 120,
                     "inc": -5,
                     "baseCost": 150,
                     "name": "Tűzgyorsaság"
                 },
                 "projectileSpeed": {
+                    "baseValue": 1200,
                     "inc": 150,
                     "baseCost": 80,
                     "name": "Lövedék Sebesség"
                 },
                 "accuracy": {
+                    "baseValue": 0.3,
                     "inc": -0.03,
                     "baseCost": 120,
                     "name": "Pontosság"
@@ -134,29 +134,29 @@
         },
         "missile": {
             "type": "homing",
-            "baseDamage": 40,
-            "baseFireRate": 1200,
-            "bulletSpeed": 400,
             "turnSpeed": 5,
-            "baseAccuracy": 0.5,
             "unlockCost": 1500,
             "upgrades": {
                 "damage": {
+                    "baseValue": 40,
                     "inc": 10,
                     "baseCost": 200,
                     "name": "Sebzés"
                 },
                 "fireRate": {
+                    "baseValue": 1200,
                     "inc": -100,
                     "baseCost": 300,
                     "name": "Tűzgyorsaság"
                 },
                 "projectileSpeed": {
+                    "baseValue": 400,
                     "inc": 50,
                     "baseCost": 150,
                     "name": "Lövedék Sebesség"
                 },
                 "accuracy": {
+                    "baseValue": 0.5,
                     "inc": -0.05,
                     "baseCost": 200,
                     "name": "Pontosság"
@@ -231,7 +231,7 @@
                     "name": "Lövedék Szórása",
                     "baseValue": 10,
                     "baseCost": 200,
-                    "inc": 1
+                    "inc": -1
                 },
                 "bulletType": {
                     "name": "Lövedék típusa",
@@ -244,27 +244,32 @@
     "playerUpgrades": {
         "maxHp": {
             "name": "Maximális életerő",
+            "baseValue": 100,
             "baseCost": 150,
-            "inc": 20
+            "inc": 10
         },
         "speed": {
             "name": "Mozgási sebesség",
+            "baseValue": 150,
             "baseCost": 200,
             "inc": 10
         },
         "maxShield": {
             "name": "Pajzs Kapacitás",
+            "baseValue": 10,
             "baseCost": 250,
             "inc": 10
         },
         "shieldRegen": {
             "name": "Shield regenerálódás",
+            "baseValue": 1,
             "baseCost": 200,
             "inc": 1
         },
         "regenDelay": {
-            "name": "Gyógyulási késleltetés (kevesebb a jobb)",
-            "baseCost": 200,
+            "name": "Pajzs/Heal Késleltetés",
+            "baseValue": 3.0,
+            "baseCost": 250,
             "inc": -0.2
         }
     },

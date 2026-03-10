@@ -79,7 +79,7 @@ export class Bot {
 
         // 1. Keringési célpont kiszámolása
         this.orbitAngle += 2 * dt;
-        const orbitRadius = 70;
+        const orbitRadius = this.name == "shooter_bot" ? 100 : 200;
 
         const targetX = this.scene.player.x + Math.cos(this.orbitAngle) * orbitRadius;
         const targetY = this.scene.player.y + Math.sin(this.orbitAngle) * orbitRadius;
@@ -111,28 +111,42 @@ export class Bot {
     }
 
     shoot() {
-        const fireRateSec = this.fireRate / 1000;
-
-        // JAVÍTVA: Date.now() helyett dt-alapú cooldown ellenőrzés
         if (this.shootTimer <= 0) {
-            this.shootTimer = fireRateSec; // Visszaszámláló újraindítása
 
             let target = null, minDist = Infinity;
+
+            // 1. Célpont keresése
             this.scene.enemyPool.pool.forEach(e => {
-                if (!e.active) return;
+                if (!e.active || e.exploding) return;
+
                 const d = (e.x - this.x) ** 2 + (e.y - this.y) ** 2;
                 if (d < minDist) { minDist = d; target = e; }
             });
 
+            // 2. Ha NINCS célpont, azonnal kilépünk. 
+            // A timer marad 0, így a következő frame-en rögtön újra tudja keresni az ellenfelet!
             if (!target) return;
 
+            // 3. Ha VAN célpont, csak EKKOR indítjuk újra a visszaszámlálót
+            const fireRateSec = this.fireRate / 1000;
+            this.shootTimer = fireRateSec;
+
+            // 4. Golyó lekérése és kilövése
             const bullet = this.scene.bulletPool.get();
-            bullet.spawn(
-                this.x, this.y,
-                target.x - this.x, target.y - this.y,
-                this.damage, this.projectileSpeed, this.bulletType, Math.max(0, this.spread)
-            );
-            this.engine.audio.sfx.shoot();
+            if (bullet) {
+                const spreadInRadians = Math.max(0, this.spread) * (Math.PI / 180);
+
+                bullet.spawn(
+                    this.x, this.y,
+                    target.x - this.x, target.y - this.y,
+                    this.damage, this.projectileSpeed, this.bulletType, spreadInRadians
+                );
+            }
+
+            // Hang lejátszása biztonságosan
+            if (this.engine.audio && this.engine.audio.sfx && this.engine.audio.sfx.shoot) {
+                this.engine.audio.sfx.shoot();
+            }
         }
     }
 
