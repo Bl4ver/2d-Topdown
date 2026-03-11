@@ -2,7 +2,7 @@
 import { Player } from "../entities/player.js";
 import { Bot } from "../entities/bot.js";
 import { Bullet } from '../entities/bullet.js';
-import { Enemy } from '../entities/enemy.js';
+import { basicEnemy } from '../entities/enemies/basicEnemy.js';
 import { ObjectPool } from "../core/objectPool.js";
 import { Physics } from "../core/physics.js";
 
@@ -18,7 +18,9 @@ export class GameScene {
 
         // Objektum poolok és entitások
         this.bulletPool = new ObjectPool(Bullet, 200, this);
-        this.enemyPool = new ObjectPool(Enemy, 200, this);
+        this.enemyPools = {
+            basic: new ObjectPool(basicEnemy, 200, this)
+        }
         this.botPool = new ObjectPool(Bot, 10, this);
         this.player = new Player(this);
 
@@ -103,7 +105,7 @@ export class GameScene {
 
             if (this.spawnTimer <= 0) {
                 const type = this.getEnemyType();
-                const enemy = this.enemyPool.get();
+                const enemy = this.enemyPools[type].get();
                 if (enemy) enemy.spawn(type);
 
                 const levelTime = (performance.now() - this.levelStartTime) / 1000;
@@ -116,7 +118,7 @@ export class GameScene {
             this.player.update(input, dt);
             this.botPool.updateAll(dt);
             this.bulletPool.updateAll(dt);
-            this.enemyPool.updateAll(dt);
+            Object.values(this.enemyPool).forEach(pool => pool.updateAll(dt));
 
             this.handleCollisions();
 
@@ -144,7 +146,7 @@ export class GameScene {
         if (this.level < this.scoreThresholds.length && this.runScore >= this.scoreThresholds[this.level]) {
             this.level++; // Szintlépés!
             this.levelStartTime = performance.now(); // Újraindítjuk a szint-időzítőt
-            this.enemyPool.releaseAll()
+            Object.values(this.enemyPools).forEach(pool => pool.releaseAll())
 
             this.updateLevelUI(); // Kiírjuk a HUD-ra
 
@@ -298,5 +300,13 @@ export class GameScene {
         this.explosions.forEach(exp => {
             this.engine.renderer.renderExplosion(exp);
         });
+    }
+
+    getAllActiveEnemies() {
+        let enemies = [];
+        Object.values(this.enemyPools).forEach(pool => {
+            enemies = enemies.concat(pool.pool.filter(e => e.active));
+        });
+        return enemies;
     }
 }

@@ -121,37 +121,22 @@ export class Enemy {
     update(dt) {
         if (!this.active) return;
 
-        // Ha éppen robban, CSÜK a részecskéket mozgatjuk, az ellenséget már nem
+        // A robbanás logikája mindenkinél ugyanaz, ez maradhat itt
         if (this.exploding) {
             let allDead = true;
             this.particles.forEach(p => {
                 p.x += p.vx * dt;
                 p.y += p.vy * dt;
-                p.life -= dt * 2; // Elhalványulás sebessége (0.5 másodperc alatt tűnik el)
-
+                p.life -= dt * 2;
                 if (p.life > 0) allDead = false;
             });
 
-            // Ha az összes szilánk eltűnt, VÉGLEG kikapcsoljuk az ellenséget
             if (allDead) {
                 this.active = false;
                 this.exploding = false;
             }
-            return; // Kilépünk, hogy ne fusson le az alatta lévő mozgás kód
-        }
-
-        // --- Normál mozgás logikája (csak ha nem robban) ---
-        this.angle += this.rotationSpeed * dt;
-
-        const dx = this.scene.player.x - this.x;
-        const dy = this.scene.player.y - this.y;
-        const magnitude = Math.sqrt(dx * dx + dy * dy);
-
-        if (magnitude > 1) {
-            const speedX = (dx / magnitude) * this.speed;
-            const speedY = (dy / magnitude) * this.speed;
-            this.x += speedX * dt;
-            this.y += speedY * dt;
         }
     }
 }
+
+
