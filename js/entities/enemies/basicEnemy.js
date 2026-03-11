@@ -1,4 +1,4 @@
-import { Enemy } from "./enemy.js";
+import { Enemy } from "../enemy.js";
 
 export class BasicEnemy extends Enemy {
     update(dt) {

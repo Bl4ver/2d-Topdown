@@ -2,7 +2,7 @@
 import { Player } from "../entities/player.js";
 import { Bot } from "../entities/bot.js";
 import { Bullet } from '../entities/bullet.js';
-import { basicEnemy } from '../entities/enemies/basicEnemy.js';
+import { BasicEnemy } from '../entities/enemies/basicEnemy.js';
 import { ObjectPool } from "../core/objectPool.js";
 import { Physics } from "../core/physics.js";
 
@@ -19,7 +19,11 @@ export class GameScene {
         // Objektum poolok és entitások
         this.bulletPool = new ObjectPool(Bullet, 200, this);
         this.enemyPools = {
-            basic: new ObjectPool(basicEnemy, 200, this)
+            basic: new ObjectPool(BasicEnemy, 200, this),
+            fast: new ObjectPool(BasicEnemy, 200, this), 
+            elite: new ObjectPool(BasicEnemy, 100, this),
+            guard: new ObjectPool(BasicEnemy, 50, this),
+            boss: new ObjectPool(BasicEnemy, 5, this)
         }
         this.botPool = new ObjectPool(Bot, 10, this);
         this.player = new Player(this);
@@ -57,21 +61,9 @@ export class GameScene {
         if (hpDisplay) hpDisplay.style.width = "100%";
         if (hpText) hpText.innerText = "100%";
 
-
-        console.log(this.state.inventory.activeBots)  // --> undifined
-        let temp = 0;
         this.state.inventory.activeBots.forEach(active => {
-            console.log(temp)
-            temp++;
             this.botPool.get().init(active, this.state, this.datas);
         });
-
-        /*
-        Object.keys(this.state.inventory.bots).forEach(bot => {
-            bot.init(bot, this.state, this.datas)
-        });
-        */
-
 
         this.runTime = 0;
         this.runScore = 0;
@@ -95,8 +87,7 @@ export class GameScene {
         document.getElementById("credits-val").innerText = "0";
     }
 
-    // GameScene.js - update metódus:
-    update(input, dt) { // Hozzáadva a dt paraméter!
+    update(input, dt) {
         if (this.player.active) {
             this.runTime = (performance.now() - this.startTime) / 1000;
 
@@ -118,7 +109,7 @@ export class GameScene {
             this.player.update(input, dt);
             this.botPool.updateAll(dt);
             this.bulletPool.updateAll(dt);
-            Object.values(this.enemyPool).forEach(pool => pool.updateAll(dt));
+            Object.values(this.enemyPools).forEach(pool => pool.updateAll(dt));
 
             this.handleCollisions();
 
@@ -142,57 +133,55 @@ export class GameScene {
     }
 
     checkLevelUp() {
-        // Megnézzük, van-e még következő szint, ÉS a pontszámunk elérte-e a határt
         if (this.level < this.scoreThresholds.length && this.runScore >= this.scoreThresholds[this.level]) {
-            this.level++; // Szintlépés!
-            this.levelStartTime = performance.now(); // Újraindítjuk a szint-időzítőt
-            Object.values(this.enemyPools).forEach(pool => pool.releaseAll())
+            this.level++;
+            this.levelStartTime = performance.now();
+            Object.values(this.enemyPools).forEach(pool => pool.releaseAll());
 
-            this.updateLevelUI(); // Kiírjuk a HUD-ra
+            this.updateLevelUI();
 
-            // Itt akár lejátszhatsz egy hangeffektet is!
             this.engine.audio.sfx.levelUp();
             console.log(`SZINTLÉPÉS! Jelenlegi szint: ${this.level}`);
         }
     }
 
     getEnemyType() {
-        // Mennyi idő telt el Mióta ebbe a szintbe léptünk (másodperc)
         const levelTime = (performance.now() - this.levelStartTime) / 1000;
         const r = Math.random();
 
         switch (this.level) {
             case 0:
                 this.minSpawnInterval = 0.2;
-                if (levelTime > 20 && r > 0.8) return "fast";   // 20%
-                return "basic";                                 // 80%
+                if (levelTime > 20 && r > 0.8) return "fast";
+                return "basic";
 
             case 1:
-                if (levelTime > 30 && r > 0.9) return "elite";  // 10%
-                if (levelTime > 10 && r > 0.6) return "fast";   // 30%
-                return "basic";                                 // 60%
+                if (levelTime > 30 && r > 0.9) return "elite";
+                if (levelTime > 10 && r > 0.6) return "fast";
+                return "basic";
 
             case 2:
-                if (levelTime > 20 && r > 0.7) return "elite";  // 30%
-                if (r > 0.4) return "fast";                     // 30%
-                return "basic";                                 // 40%
+                if (levelTime > 20 && r > 0.7) return "elite";
+                if (r > 0.4) return "fast";
+                return "basic";
 
             case 3:
-                if (r > 0.6) return "elite";                    // 40%
-                if (r > 0.2) return "fast";                     // 40%
-                return "basic";                                 // 20%
+                if (r > 0.6) return "elite";
+                if (r > 0.2) return "fast";
+                return "basic";
             case 4:
-                if (r > 0.9) return "guard";                    // 10%
-                if (r > 0.4) return "elite";                    // 50%
-                return "fast";                                  // 40%
+                if (r > 0.9) return "guard";
+                if (r > 0.4) return "elite";
+                return "fast";
             case 5:
-                if (!this.bossFight) { this.bossFight = true; return "boss" }      // 100% első alkalomra
-                if (r > 0.8) return "guard";                    // 20%
+                if (!this.bossFight) { this.bossFight = true; return "boss"; }
+                if (r > 0.8) return "guard";
                 this.minSpawnInterval = 20;
-                return "elite";                                 // 80%
+                return "elite";
             case 6:
                 this.bossFight = false;
                 this.engine.changeScene("menu");
+                return "basic"; // Hozzáadtam egy visszatérési értéket, hogy ne legyen undefined
             default:
                 return "basic";
         }
@@ -210,16 +199,13 @@ export class GameScene {
     finalizeStats() {
         const stats = this.engine.state.statistics;
 
-        // 1. Összes játszott idő
         stats.totalPlayTime += this.runTime;
         stats.totalGamesPlayed += 1;
 
-        // 2. MAX TIME (Rekord túlélés)
         if (this.runTime > stats.maxTime) {
             stats.maxTime = this.runTime;
         }
 
-        // 3. MIN TIME (Leggyorsabb vereség)
         if (this.runTime > 1) {
             if (stats.minTime === 0 || this.runTime < stats.minTime) {
                 stats.minTime = this.runTime;
@@ -234,48 +220,53 @@ export class GameScene {
         this.bulletPool.pool.forEach(bullet => {
             if (!bullet.active) return;
 
-            this.enemyPool.pool.forEach(enemy => {
-                if (enemy.active && !enemy.exploding) {
-                    if (this.physics.checkCollision(bullet, enemy)) {
-                        if (bullet.type === "homing") {
-                            this.triggerExplosion(bullet);
-                        } else {
-                            enemy.takeDamage(bullet.damage);
+            // JAVÍTVA: foreach -> forEach
+            Object.values(this.enemyPools).forEach(pool => {
+                pool.pool.forEach(enemy => {
+                    if (enemy.active && !enemy.exploding) {
+                        if (this.physics.checkCollision(bullet, enemy)) {
+                            if (bullet.type === "homing") {
+                                this.triggerExplosion(bullet);
+                            } else {
+                                enemy.takeDamage(bullet.damage);
+                            }
+                            bullet.active = false;
                         }
-                        bullet.active = false;
                     }
-                }
-
-
+                });
             });
         });
 
         // --- B: Ellenségek vs Játékos ---
-        this.enemyPool.pool.forEach(enemy => {
-            if (enemy.active && !enemy.exploding) {
-
-                if (this.physics.checkCollision(enemy, this.player)) {
-                    // Itt maradhat az "ütközési" sebzés (pl. az enemy HP-ja vonódik le a játékostól)
-                    this.player.takeDamage(enemy.hp);
-                    enemy.die();
+        // JAVÍTVA: foreach -> forEach
+        Object.values(this.enemyPools).forEach(pool => {
+            pool.pool.forEach(enemy => {
+                if (enemy.active && !enemy.exploding) {
+                    if (this.physics.checkCollision(enemy, this.player)) {
+                        this.player.takeDamage(enemy.hp);
+                        enemy.die();
+                    }
                 }
-            }
+            });
         });
     }
 
     triggerExplosion(bullet) {
         this.engine.audio.sfx.explosion();
 
-        this.enemyPool.pool.forEach(enemy => {
-            if (!enemy.active) return;
-            const dx = enemy.x - bullet.x;
-            const dy = enemy.y - bullet.y;
-            const distSq = dx * dx + dy * dy;
+        // JAVÍTVA: this.enemyPool.pool helyett a több poolt tartalmazó objektumon iterálunk végig
+        Object.values(this.enemyPools).forEach(pool => {
+            pool.pool.forEach(enemy => {
+                if (!enemy.active) return;
+                const dx = enemy.x - bullet.x;
+                const dy = enemy.y - bullet.y;
+                const distSq = dx * dx + dy * dy;
 
-            const radius = bullet.explosionRadius || 100;
-            if (distSq <= radius * radius) {
-                enemy.takeDamage(bullet.damage);
-            }
+                const radius = bullet.explosionRadius || 100;
+                if (distSq <= radius * radius) {
+                    enemy.takeDamage(bullet.damage);
+                }
+            });
         });
 
         this.explosions.push({
@@ -294,7 +285,12 @@ export class GameScene {
     draw(ctx) {
         this.engine.renderer.renderPlayer(this.player);
         this.botPool.pool.forEach(bot => this.engine.renderer.renderBot(bot));
-        this.enemyPool.pool.forEach(enemy => this.engine.renderer.renderEnemy(enemy));
+        
+        // JAVÍTVA: this.enemyPool.pool helyett az összes poolt végigiteráljuk
+        Object.values(this.enemyPools).forEach(pool => {
+            pool.pool.forEach(enemy => this.engine.renderer.renderEnemy(enemy));
+        });
+        
         this.bulletPool.pool.forEach(bullet => this.engine.renderer.renderBullet(bullet));
 
         this.explosions.forEach(exp => {
