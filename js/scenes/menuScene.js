@@ -7,6 +7,7 @@ export class MenuScene{
         this.engine.uiManager.showScreen("main-menu");
         this.engine.uiManager.bindButtonEvents({
             onStart: () => this.engine.changeScene("game"),
+            onTestground: () => this.engine.changeScene("testground"),
             onSettings: () => this.engine.changeScene("settings"),
             onUpgrades: () => this.engine.changeScene("upgrades"),
             onEncyclopedia: () => this.engine.changeScene("encyclopedia"),

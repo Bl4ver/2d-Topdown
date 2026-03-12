@@ -1,3 +1,4 @@
+// enemy.js
 export class Enemy {
     constructor(scene) {
         this.engine = scene.engine;
@@ -7,11 +8,10 @@ export class Enemy {
 
         this.x = 0;
         this.y = 0;
-        this.target = { x: 0, y: 0 };
         this.active = false;
-
         this.angle = 0;
 
+        // Adatok
         this.hp = 0;
         this.maxHp = 0;
         this.damage = 0;
@@ -20,7 +20,7 @@ export class Enemy {
         this.height = 0;
         this.radius = 0;
         this.scoreValue = 0;
-        this.earnedCoin = 0;
+        this.coinAmount = 0;
         this.rotationSpeed = 0;
         this.color = "";
         this.type = "";
@@ -41,10 +41,10 @@ export class Enemy {
         const side = (d >= w) + (d >= w + h) + (d >= 2 * w + h);
 
         switch (side) {
-            case 0: this.x = d; this.y = 0; break;
-            case 1: this.x = w; this.y = d - w; break;
-            case 2: this.x = (2 * w + h) - d; this.y = h; break;
-            case 3: this.x = 0; this.y = (2 * w + 2 * h) - d; break;
+            case 0: this.x = d; this.y = -50; break;
+            case 1: this.x = w + 50; this.y = d - w; break;
+            case 2: this.x = (2 * w + h) - d; this.y = h + 50; break;
+            case 3: this.x = -50; this.y = (2 * w + 2 * h) - d; break;
         }
 
         this.hp = template.hp;
@@ -72,8 +72,9 @@ export class Enemy {
         if (this.hp - damage > 0) {
             this.engine.audio.sfx.hit();
             this.hp -= damage;
-        } else this.die();
-
+        } else {
+            this.die();
+        }
     }
 
     die() {
@@ -84,9 +85,8 @@ export class Enemy {
         this.engine.state.highScore = Math.max(this.engine.state.highScore, this.scene.runScore + this.scoreValue);
 
         this.scene.runScore += this.scoreValue;
-        const earnedCoin = this.coinAmount;
-        this.scene.runCoins += earnedCoin;
-        this.engine.state.coins += earnedCoin;
+        this.scene.runCoins += this.coinAmount;
+        this.engine.state.coins += this.coinAmount;
 
         const scoreElement = document.getElementById("score");
         if (scoreElement) scoreElement.innerText = String(this.scene.runScore).padStart(6, '0');
@@ -103,11 +103,10 @@ export class Enemy {
             this.particles.push({
                 x: this.x,
                 y: this.y,
-                // Véletlenszerű irány és sebesség (-250 és +250 között)
                 vx: (Math.random() - 0.5) * 500,
                 vy: (Math.random() - 0.5) * 500,
-                life: 1.0, // Élettartam (1.0 = 100%, 0 = eltűnt)
-                size: Math.random() * 4 + 2 // Véletlenszerű méret 2 és 6 pixel között
+                life: 1.0,
+                size: Math.random() * 4 + 2
             });
         }
     }
@@ -115,6 +114,16 @@ export class Enemy {
     update(dt) {
         if (!this.active) return;
 
+        // --- FORGÁS LOGIKA ---
+        if (!this.exploding) {
+            this.angle += this.rotationSpeed * dt;
+
+            if (this.angle >= Math.PI * 2) {
+                this.angle -= Math.PI * 2;
+            }
+        }
+
+        // --- RÉSZECSKÉK (ROBBANÁS) KEZELÉSE ---
         if (this.exploding) {
             let allDead = true;
             this.particles.forEach(p => {
@@ -131,5 +140,3 @@ export class Enemy {
         }
     }
 }
-
-

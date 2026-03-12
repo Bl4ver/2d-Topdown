@@ -27,6 +27,7 @@ export class StatisticsScene {
         this.setStatText("stat-maxTime", this.formatTime(stats.maxTime));
         this.setStatText("stat-minTime", this.formatTime(stats.minTime));
         this.setStatText("stat-allTime", this.formatTime(stats.totalPlayTime));
+        this.setStatText("stat-testTime", this.formatTime(stats.testGroundTime));
     }
 
     // Segédfüggvény az élesebb kódért

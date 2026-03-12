@@ -4,8 +4,6 @@ export class Audio {
         this.engine = engine;
         this.audioCtx;
 
-        // TÖRÖLVE: this.volumes és a console.log, mert induláskor még nincs state!
-
         this.sfx = {
             shoot: () => this.playSoundEffect(450, 'square', 0.08, 0.03),
             hit: () => this.playSoundEffect(150, 'sawtooth', 0.1, 0.06, false),
@@ -37,7 +35,17 @@ export class Audio {
                 this.playSoundEffect(400, 'sine', 0.1, 0.2, false);
                 setTimeout(() => this.playSoundEffect(600, 'sine', 0.1, 0.2, false), 100);
                 setTimeout(() => this.playSoundEffect(800, 'sine', 0.4, 0.3, false), 200);
-            }
+            },
+            bossRage: () => {
+                // 1. Rész: Egy hosszú, nagyon mély, csökkenő morgás (sawtooth)
+                this.playSoundEffect(100, 'sawtooth', 1.5, 0.4);
+                
+                // 2. Rész: Egy kis késéssel egy magasabb, figyelemfelkeltő "sziréna/visítás" szerű hang (square), ami nem esik le (pitchDrop: false)
+                setTimeout(() => this.playSoundEffect(400, 'square', 0.8, 0.2, false), 200);
+                
+                // 3. Rész: Még egy kis utórezgés a mély tartományban
+                setTimeout(() => this.playSoundEffect(50, 'sawtooth', 1.0, 0.3), 500);
+            },
         };
     }
 

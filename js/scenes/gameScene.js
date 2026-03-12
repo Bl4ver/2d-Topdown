@@ -1,14 +1,22 @@
 // gameScene.js
 import { Player } from "../entities/player.js";
-import { Bot } from "../entities/bot.js";
 import { Bullet } from '../entities/bullet.js';
-import { BasicEnemy } from '../entities/enemies/basicEnemy.js';
-import { FastEnemy } from '../entities/enemies/fastEnemy.js';
-import { EliteEnemy } from '../entities/enemies/eliteEnemy.js';
-import { ShooterEnemy } from '../entities/enemies/shooterEnemy.js';
-import { TeleporterEnemy } from '../entities/enemies/teleporterEnemy.js';
-import { GuardEnemy } from '../entities/enemies/guardEnemy.js';
-import { BossEnemy } from '../entities/enemies/bossEnemy.js';
+
+import { RepairBot } from '../entities/bots/repairBot.js';
+import { ShooterBot } from '../entities/bots/shooterBot.js';
+// import { MinerBot } from '../entities/bots/minerBot.js';
+// import { BuilderBot } from '../entities/bots/builderBot.js';
+// import { FighterBot } from '../entities/bots/fighterBot.js';
+// import { GuardBot } from '../entities/bots/guardBot.js';
+// import { ScoutBot } from '../entities/bots/scoutBot.js';
+
+import { MeleeEnemy } from '../entities/enemyTypes/meleeEnemy.js';
+import { ChargerEnemy } from '../entities/enemyTypes/chargerEnemy.js';
+import { RangedEnemy } from '../entities/enemyTypes/rangedEnemy.js';
+import { KamikazeEnemy } from '../entities/enemyTypes/kamikazeEnemy.js';
+import { SupportEnemy } from '../entities/enemyTypes/supportEnemy.js';
+import { BossEnemy } from '../entities/enemyTypes/bossEnemy.js';
+
 import { ObjectPool } from "../core/objectPool.js";
 import { Physics } from "../core/physics.js";
 
@@ -27,15 +35,23 @@ export class GameScene {
         this.playerBulletPool = new ObjectPool(Bullet, 200, this);
         this.enemyBulletPool = new ObjectPool(Bullet, 200, this);
         this.enemyPools = {
-            basic: new ObjectPool(BasicEnemy, 200, this),
-            fast: new ObjectPool(FastEnemy, 200, this),
-            elite: new ObjectPool(EliteEnemy, 100, this),
-            shooter: new ObjectPool(ShooterEnemy, 50, this),
-            teleporter: new ObjectPool(TeleporterEnemy, 50, this),
-            guard: new ObjectPool(GuardEnemy, 50, this),
+            melee: new ObjectPool(MeleeEnemy, 300, this),
+            range: new ObjectPool(RangedEnemy, 100, this),
+            kamikaze: new ObjectPool(KamikazeEnemy, 100, this),
+            support: new ObjectPool(SupportEnemy, 50, this),
+            charger: new ObjectPool(ChargerEnemy, 100, this),
             boss: new ObjectPool(BossEnemy, 5, this)
-        }
-        this.botPool = new ObjectPool(Bot, 10, this);
+        };
+
+        this.botPools = {
+            repair: new ObjectPool(RepairBot, 10, this),
+            shooter: new ObjectPool(ShooterBot, 10, this)
+            // miner: new ObjectPool(MinerBot, 10, this),
+            // builder: new ObjectPool(BuilderBot, 10, this),
+            // fighter: new ObjectPool(FighterBot, 10, this),
+            // guard: new ObjectPool(GuardBot, 10, this),
+            // scout: new ObjectPool(ScoutBot, 10, this)
+        };
 
         // Run statisztikák
         this.runCoins = 0;
@@ -71,7 +87,8 @@ export class GameScene {
         if (hpText) hpText.innerText = "100%";
 
         this.state.inventory.activeBots.forEach(active => {
-            this.botPool.get().init(active, this.state, this.datas);
+            if (!this.botPools[active]) return;
+            this.botPools[active].get().init(active, this.state, this.datas);
         });
 
         this.runTime = 0;
@@ -104,19 +121,25 @@ export class GameScene {
             this.spawnTimer -= dt;
 
             if (this.spawnTimer <= 0) {
-                const type = this.getEnemyType();
-                const enemy = this.enemyPools[type].get();
-                if (enemy) enemy.spawn(type);
+                const enemyName = this.getEnemyName();
+                const enemyData = this.datas.enemies[enemyName];
+
+                if (enemyData) {
+                    const poolType = enemyData.type;
+                    const targetPool = this.enemyPools[poolType];
+                    const enemy = targetPool.get();
+
+                    if (enemy) enemy.spawn(enemyName);
+                }
 
                 const levelTime = (performance.now() - this.levelStartTime) / 1000;
-
                 const difficultyMultiplier = Math.max(this.minSpawnInterval, this.baseSpawnInterval - (levelTime / 30));
                 this.spawnTimer = difficultyMultiplier;
             }
             this.updateTimerUI();
 
             this.player.update(input, dt);
-            this.botPool.updateAll(dt);
+            Object.values(this.botPools).forEach(pool => pool.updateAll(dt));
             this.playerBulletPool.updateAll(dt);
             this.enemyBulletPool.updateAll(dt);
             Object.values(this.enemyPools).forEach(pool => pool.updateAll(dt));
@@ -155,47 +178,82 @@ export class GameScene {
         }
     }
 
-    getEnemyType() {
+    getEnemyName() {
         const levelTime = (performance.now() - this.levelStartTime) / 1000;
         const r = Math.random();
 
         switch (this.level) {
             case 0:
-                this.minSpawnInterval = 0.2;
-                if (levelTime > 20 && r > 0.8) return "fast";
-                return "teleporter";
+                // 1. Szint (0): Könnyű kezdés, sok apró Swarm, később Basic
+                this.minSpawnInterval = 0.3;
+                if (levelTime > 20 && r > 0.7) return "basic";
+                return "swarm";
 
             case 1:
-                if (levelTime > 30 && r > 0.9) return "elite";
-                if (levelTime > 10 && r > 0.6) return "fast";
+                // 2. Szint (1): Bejönnek a gyorsak és a bombázók
+                this.minSpawnInterval = 0.25;
+                if (levelTime > 30 && r > 0.8) return "bomber";
+                if (levelTime > 10 && r > 0.5) return "fast";
                 return "basic";
 
             case 2:
-                if (levelTime > 20 && r > 0.7) return "elite";
-                if (r > 0.4) return "fast";
-                return "basic";
+                // 3. Szint (2): Megjelenik a tankos Brute, a gyógyító Healer és egy-egy Bullet
+                this.minSpawnInterval = 0.2;
+                if (levelTime > 20 && r > 0.85) return "healer";
+                if (r > 0.7) return "bullet";
+                if (r > 0.5) return "brute";
+                if (r > 0.3) return "fast";
+                return "swarm";
 
             case 3:
+                // 4. Szint (3): Lövöldözős szakasz (Shooter és Teleporter)
+                if (r > 0.8) return "charger";
                 if (r > 0.6) return "elite";
-                if (r > 0.2) return "fast";
-                return "shooter";
-            case 4:
-                if (r > 0.9) return "guard";
-                if (r > 0.4) return "elite";
+                if (r > 0.3) return "shooter";
+                if (r > 0.1) return "teleporter";
                 return "fast";
+
+            case 4:
+                // 5. Szint (4): Nagyon kemény normál hullám (Guard, Sniper, és Bullet horda)
+                if (r > 0.9) return "guard";
+                if (r > 0.75) return "charger";
+                if (r > 0.6) return "sniper";
+                if (r > 0.3) return "elite";
+                return "healer";
+
             case 5:
-                if (!this.bossFight) { this.bossFight = true; return "boss"; }
-                if (r > 0.8) return "guard";
-                this.minSpawnInterval = 20;
-                return "elite";
+                // 6. Szint (5): MINIBOSS HARC
+                if (!this.bossFight) {
+                    this.bossFight = true;
+                    return "miniboss";
+                }
+                // Amíg a Miniboss él, elit seregek jönnek lassan
+                this.minSpawnInterval = 3.0;
+                if (r > 0.8) return "charger";
+                if (r > 0.6) return "brute";
+                return "fast";
+
             case 6:
+                // 7. Szint (6): VÉGSŐ BOSS HARC
+                if (!this.bossFight) {
+                    this.bossFight = true;
+                    return "boss";
+                }
+                this.minSpawnInterval = 4.0;
+                if (r > 0.8) return "guard";
+                return "shooter";
+
+            case 7:
+                // Győzelem utáni kilépés
                 this.bossFight = false;
                 this.engine.changeScene("menu");
                 return "basic";
+
             default:
                 return "basic";
         }
     }
+
 
     updateTimerUI() {
         const runTimeDisplay = document.getElementById("run-time-display");
@@ -262,19 +320,21 @@ export class GameScene {
         this.enemyBulletPool.pool.forEach(bullet => {
             if (!bullet.active) return;
 
-            if (this.botPool.pool.length > 0) {
-                this.botPool.pool.forEach(bot => {
-                    if (this.physics.checkCollision(bullet, bot)) {
-                        bot.takeDamage(bullet.damage);
-                        bullet.active = false;
-                    }
-                });
-            }
-
             if (this.physics.checkCollision(bullet, this.player)) {
                 this.player.takeDamage(bullet.damage);
                 bullet.active = false;
             }
+
+            Object.values(this.botPools).forEach(pool => {
+                pool.pool.forEach(bot => {
+                    if (bot.active && !bot.exploding) {
+                        if (this.physics.checkCollision(bullet, bot)) {
+                            bot.takeDamage(bullet.damage);
+                            bullet.active = false;
+                        }
+                    }
+                });
+            });
         });
     }
 
@@ -310,7 +370,10 @@ export class GameScene {
 
     draw(ctx) {
         this.engine.renderer.renderPlayer(this.player);
-        this.botPool.pool.forEach(bot => this.engine.renderer.renderBot(bot));
+
+        Object.values(this.botPools).forEach(pool => {
+            pool.pool.forEach(bot => this.engine.renderer.renderBot(bot));
+        });
 
         Object.values(this.enemyPools).forEach(pool => {
             pool.pool.forEach(enemy => this.engine.renderer.renderEnemy(enemy));

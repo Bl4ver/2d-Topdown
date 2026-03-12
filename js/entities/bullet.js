@@ -42,10 +42,12 @@ export class Bullet {
     update(dt) {
         if (this.type === "homing") {
             let target = null, minDist = Infinity;
-            this.scene.enemyPool.pool.forEach(e => {
-                if (!e.active) return;
-                const d = (e.x - this.x) ** 2 + (e.y - this.y) ** 2;
-                if (d < minDist) { minDist = d; target = e; }
+            Object.values(this.scene.enemyPools).forEach(pool => {
+                pool.pool.forEach(e => {
+                    if (!e.active) return;
+                    const d = (e.x - this.x) ** 2 + (e.y - this.y) ** 2;
+                    if (d < minDist) { minDist = d; target = e; }
+                });
             });
             if (target) {
                 const desired = Math.atan2(target.y - this.y, target.x - this.x);

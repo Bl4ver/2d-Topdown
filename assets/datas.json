@@ -3,7 +3,7 @@
         "basic": {
             "hp": 50,
             "damage": 0,
-            "speed": 200,
+            "speed": 180,
             "width": 30,
             "height": 30,
             "radius": 30,
@@ -14,38 +14,94 @@
             "type": "melee",
             "level": 1
         },
-        "fast": {
-            "hp": 30,
+        "swarm": {
+            "hp": 15,
             "damage": 0,
-            "speed": 299,
+            "speed": 220,
             "width": 15,
             "height": 15,
             "radius": 15,
+            "scoreValue": 50,
+            "earnedCoin": 5,
+            "rotationSpeed": 5,
+            "color": "#c471ed",
+            "type": "melee",
+            "level": 1
+        },
+        "fast": {
+            "hp": 30,
+            "damage": 0,
+            "speed": 320,
+            "width": 20,
+            "height": 20,
+            "radius": 20,
             "scoreValue": 150,
             "earnedCoin": 15,
-            "rotationSpeed": 10,
+            "rotationSpeed": 8,
             "color": "yellow",
             "type": "melee",
             "level": 2
         },
-        "elite": {
-            "hp": 500,
+        "bomber": {
+            "hp": 40,
+            "damage": 50,
+            "speed": 260,
+            "width": 25,
+            "height": 25,
+            "radius": 25,
+            "scoreValue": 200,
+            "earnedCoin": 25,
+            "rotationSpeed": 10,
+            "color": "#ff4500",
+            "type": "kamikaze",
+            "level": 2
+        },
+        "brute": {
+            "hp": 250,
             "damage": 0,
-            "speed": 150,
-            "width": 30,
-            "height": 30,
-            "radius": 30,
-            "scoreValue": 250,
-            "earnedCoin": 50,
+            "speed": 120,
+            "width": 45,
+            "height": 45,
+            "radius": 45,
+            "scoreValue": 200,
+            "earnedCoin": 30,
             "rotationSpeed": 2,
+            "color": "#8b4513",
+            "type": "melee",
+            "level": 2
+        },
+        "bullet": {
+            "hp": 5,
+            "damage": 20,
+            "speed": 500,
+            "width": 5,
+            "height": 5,
+            "radius": 5,
+            "scoreValue": 300,
+            "earnedCoin": 55,
+            "rotationSpeed": 0,
+            "color": "black",
+            "type": "charger",
+            "level": 2
+        },
+        "elite": {
+            "hp": 600,
+            "damage": 0,
+            "speed": 160,
+            "width": 40,
+            "height": 40,
+            "radius": 40,
+            "scoreValue": 350,
+            "earnedCoin": 60,
+            "rotationSpeed": 3,
             "color": "red",
             "type": "melee",
             "level": 3
         },
         "shooter": {
-            "hp": 50,
-            "damage": 10,
-            "speed": 150,
+            "hp": 80,
+            "damage": 15,
+            "speed": 140,
             "width": 30,
             "height": 30,
             "radius": 30,
@@ -56,47 +112,89 @@
             "type": "range",
             "level": 3
         },
-        "teleporter": {
-            "hp": 10,
-            "damage": 10,
-            "speed": 100,
-            "width": 10,
-            "height": 10,
-            "radius": 10,
-            "scoreValue": 250,
-            "earnedCoin": 50,
+        "healer": {
+            "hp": 150,
+            "damage": 0,
+            "speed": 130,
+            "width": 35,
+            "height": 35,
+            "radius": 35,
+            "scoreValue": 300,
+            "earnedCoin": 45,
             "rotationSpeed": 2,
+            "color": "#00fa9a",
+            "type": "support",
+            "level": 3
+        },
+        "teleporter": {
+            "hp": 60,
+            "damage": 20,
+            "speed": 100,
+            "width": 25,
+            "height": 25,
+            "radius": 25,
+            "scoreValue": 300,
+            "earnedCoin": 55,
+            "rotationSpeed": 4,
             "color": "blue",
             "type": "melee",
             "level": 3
         },
         "guard": {
-            "hp": 5000,
+            "hp": 3500,
             "damage": 0,
-            "speed": 75,
+            "speed": 90,
             "width": 60,
             "height": 60,
             "radius": 60,
-            "scoreValue": 750,
-            "earnedCoin": 300,
-            "rotationSpeed": 1,
+            "scoreValue": 800,
+            "earnedCoin": 200,
+            "rotationSpeed": 1.5,
             "color": "orange",
             "type": "melee",
             "level": 4
         },
+        "sniper": {
+            "hp": 100,
+            "damage": 40,
+            "speed": 80,
+            "width": 30,
+            "height": 30,
+            "radius": 30,
+            "scoreValue": 500,
+            "earnedCoin": 100,
+            "rotationSpeed": 1,
+            "color": "#00ced1",
+            "type": "range",
+            "level": 4
+        },
+        "miniboss": {
+            "hp": 15000,
+            "damage": 80,
+            "speed": 65,
+            "width": 90,
+            "height": 90,
+            "radius": 90,
+            "scoreValue": 5000,
+            "earnedCoin": 1000,
+            "rotationSpeed": 0.5,
+            "color": "#4b0082",
+            "type": "melee",
+            "level": 5
+        },
         "boss": {
             "hp": 100000,
-            "damage": 0,
-            "speed": 25,
+            "damage": 150,
+            "speed": 35,
             "width": 150,
             "height": 150,
             "radius": 150,
-            "scoreValue": 1000000,
-            "earnedCoin": 20000,
-            "rotationSpeed": 0.1,
+            "scoreValue": 50000,
+            "earnedCoin": 10000,
+            "rotationSpeed": 0.2,
             "color": "gray",
             "type": "melee",
-            "level": 5
+            "level": 6
         }
     },
     "weapons": {
@@ -193,7 +291,7 @@
         }
     },
     "bots": {
-        "repair_bot": {
+        "repair": {
             "unlockCost": 1000,
             "upgrades": {
                 "maxHp": {
@@ -222,7 +320,7 @@
                 }
             }
         },
-        "shooter_bot": {
+        "shooter": {
             "unlockCost": 1000,
             "upgrades": {
                 "maxHp": {
@@ -257,9 +355,9 @@
                 },
                 "spread": {
                     "name": "Lövedék Szórása",
-                    "baseValue": 10,
+                    "baseValue": 1,
                     "baseCost": 200,
-                    "inc": -1
+                    "inc": -0.05
                 },
                 "bulletType": {
                     "name": "Lövedék típusa",
@@ -302,7 +400,7 @@
         }
     },
     "state": {
-        "coins": 1000000,
+        "coins": 0,
         "highScore": 0,
         "settings": {
             "volume": 50,
@@ -364,7 +462,7 @@
                 }
             },
             "bots": {
-                "repair_bot": {
+                "repair": {
                     "unlocked": false,
                     "levels": {
                         "maxHp": 1,
@@ -373,7 +471,7 @@
                         "healRate": 1
                     }
                 },
-                "shooter_bot": {
+                "shooter": {
                     "unlocked": false,
                     "levels": {
                         "maxHp": 1,

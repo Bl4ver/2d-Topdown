@@ -9,6 +9,8 @@ import { StatisticsScene } from "./scenes/statisticsScene.js";
 import { EncyclopediaScene } from "./scenes/encyclopediaScene.js";
 import { SettingsScene } from "./scenes/settingsScene.js";
 
+import { TestGroundScene } from "./scenes/testGroundScene.js";
+
 export class GameEngine {
     constructor() {
         this.canvas = document.getElementById("gameCanvas");
@@ -99,6 +101,7 @@ export class GameEngine {
         const scenes = {
             menu: MenuScene,
             game: GameScene,
+            testground: TestGroundScene,
             upgrades: UpgradeScene,
             statistics: StatisticsScene,
             encyclopedia: EncyclopediaScene,
@@ -176,5 +179,5 @@ export class GameEngine {
         }
     }
 
-    save() { /*localStorage.setItem("neonO-save", JSON.stringify(this.state)); */ }
+    save() { localStorage.setItem("neonO-save", JSON.stringify(this.state)); }
 }

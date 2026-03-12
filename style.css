@@ -278,6 +278,18 @@ html {
     transform: translateY(-2px);
 }
 
+#btn-testground {
+    color: var(--neon-green);
+    border: 2px solid var(--neon-green);
+}
+
+#btn-testground:hover {
+    background: var(--neon-green);
+    color: black;
+    box-shadow: 0 0 30px var(--neon-green);
+    transform: translateY(-2px);
+}
+
 #btn-upgrades {
     color: var(--neon-purple);
     border: 2px solid var(--neon-purple);
