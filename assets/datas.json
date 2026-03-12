@@ -42,6 +42,20 @@
             "type": "melee",
             "level": 3
         },
+        "shooter": {
+            "hp": 500,
+            "damage": 10,
+            "speed": 150,
+            "width": 30,
+            "height": 30,
+            "radius": 30,
+            "scoreValue": 250,
+            "earnedCoin": 50,
+            "rotationSpeed": 2,
+            "color": "pink",
+            "type": "range",
+            "level": 3
+        },
         "guard": {
             "hp": 5000,
             "damage": 0,

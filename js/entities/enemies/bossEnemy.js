@@ -1,6 +1,6 @@
 import { Enemy } from "../enemy.js";
 
-export class BasicEnemy extends Enemy {
+export class BossEnemy extends Enemy {
     update(dt) {
         super.update(dt);
         

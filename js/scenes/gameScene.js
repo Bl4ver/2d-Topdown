@@ -3,6 +3,11 @@ import { Player } from "../entities/player.js";
 import { Bot } from "../entities/bot.js";
 import { Bullet } from '../entities/bullet.js';
 import { BasicEnemy } from '../entities/enemies/basicEnemy.js';
+import { FastEnemy } from '../entities/enemies/fastEnemy.js';
+import { EliteEnemy } from '../entities/enemies/eliteEnemy.js';
+import { ShooterEnemy } from '../entities/enemies/shooterEnemy.js';
+import { GuardEnemy } from '../entities/enemies/guardEnemy.js';
+import { BossEnemy } from '../entities/enemies/bossEnemy.js';
 import { ObjectPool } from "../core/objectPool.js";
 import { Physics } from "../core/physics.js";
 
@@ -20,10 +25,11 @@ export class GameScene {
         this.bulletPool = new ObjectPool(Bullet, 200, this);
         this.enemyPools = {
             basic: new ObjectPool(BasicEnemy, 200, this),
-            fast: new ObjectPool(BasicEnemy, 200, this), 
-            elite: new ObjectPool(BasicEnemy, 100, this),
-            guard: new ObjectPool(BasicEnemy, 50, this),
-            boss: new ObjectPool(BasicEnemy, 5, this)
+            fast: new ObjectPool(FastEnemy, 200, this), 
+            elite: new ObjectPool(EliteEnemy, 100, this),
+            shooter: new ObjectPool(ShooterEnemy, 50, this),
+            guard: new ObjectPool(GuardEnemy, 50, this),
+            boss: new ObjectPool(BossEnemy, 5, this)
         }
         this.botPool = new ObjectPool(Bot, 10, this);
         this.player = new Player(this);
@@ -153,7 +159,7 @@ export class GameScene {
             case 0:
                 this.minSpawnInterval = 0.2;
                 if (levelTime > 20 && r > 0.8) return "fast";
-                return "basic";
+                return "shooter";
 
             case 1:
                 if (levelTime > 30 && r > 0.9) return "elite";
@@ -168,7 +174,7 @@ export class GameScene {
             case 3:
                 if (r > 0.6) return "elite";
                 if (r > 0.2) return "fast";
-                return "basic";
+                return "shooter";
             case 4:
                 if (r > 0.9) return "guard";
                 if (r > 0.4) return "elite";
@@ -181,7 +187,7 @@ export class GameScene {
             case 6:
                 this.bossFight = false;
                 this.engine.changeScene("menu");
-                return "basic"; // Hozzáadtam egy visszatérési értéket, hogy ne legyen undefined
+                return "basic";
             default:
                 return "basic";
         }
