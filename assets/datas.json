@@ -43,7 +43,7 @@
             "level": 3
         },
         "shooter": {
-            "hp": 500,
+            "hp": 50,
             "damage": 10,
             "speed": 150,
             "width": 30,
@@ -54,6 +54,20 @@
             "rotationSpeed": 2,
             "color": "pink",
             "type": "range",
+            "level": 3
+        },
+        "teleporter": {
+            "hp": 10,
+            "damage": 10,
+            "speed": 100,
+            "width": 10,
+            "height": 10,
+            "radius": 10,
+            "scoreValue": 250,
+            "earnedCoin": 50,
+            "rotationSpeed": 2,
+            "color": "blue",
+            "type": "melee",
             "level": 3
         },
         "guard": {

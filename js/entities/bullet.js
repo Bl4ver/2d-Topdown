@@ -1,4 +1,3 @@
-// bullet.js
 export class Bullet {
     constructor(scene) {
         this.scene = scene;

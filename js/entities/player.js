@@ -40,7 +40,7 @@ export class Player {
         this.ui.shieldFill = document.getElementById("shield-fill");
         this.ui.shieldVal = document.getElementById("shield-val");
 
-        const getLvl = (key) => state.upgrades[key + "Level"] || 1; 
+        const getLvl = (key) => state.upgrades[key + "Level"] || 1;
         const upg = datas.playerUpgrades;
 
         // EGYETLEN KÉPLET MINDENRE: Bázis + (Növekmény * (Szint - 1))
@@ -48,14 +48,14 @@ export class Player {
 
         this.maxHp = getStat("maxHp");
         this.hp = this.maxHp;
-        
+
         this.speed = getStat("speed");
-        
+
         this.maxShield = getStat("maxShield");
         this.shield = this.maxShield;
-        
+
         this.shieldRegen = getStat("shieldRegen");
-        
+
         let calcDelay = getStat("regenDelay");
         this.regenDelayValue = Math.max(0.5, calcDelay); // Minimum 0.5mp cooldown
 
@@ -68,6 +68,8 @@ export class Player {
     }
 
     takeDamage(dmg) {
+        if (this.isDashing) return;
+        
         if (this.shield > 0) {
             if (this.shield >= dmg) {
                 this.shield -= dmg;
@@ -118,7 +120,7 @@ export class Player {
         if (this.shield < this.maxShield && this.damageCooldownTimer <= 0) {
             this.shield += this.shieldRegen * dt;
             if (this.shield > this.maxShield) this.shield = this.maxShield;
-            this.updateUI(); 
+            this.updateUI();
         }
 
         if (input.isKeyDown("mouse")) this.shoot();
@@ -160,14 +162,14 @@ export class Player {
             const spd = getWepStat("projectileSpeed");
             let spread = getWepStat("accuracy");
 
-            const bullet = this.scene.bulletPool.get();
+            const bullet = this.scene.playerBulletPool.get();
             if (bullet) {
                 bullet.spawn(
                     this.x, this.y,
                     this.mouse.x - this.x, this.mouse.y - this.y,
                     dmg, spd, weaponData.type, Math.max(0, spread)
                 );
-                
+
                 if (this.engine.audio && this.engine.audio.sfx) {
                     this.engine.audio.sfx.shoot();
                 }
@@ -177,7 +179,6 @@ export class Player {
 
     heal(amount) {
         this.hp = Math.min(this.hp + amount, this.maxHp);
-        console.log(this.hp)
         this.updateUI();
     }
 

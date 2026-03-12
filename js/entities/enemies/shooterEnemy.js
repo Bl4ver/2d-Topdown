@@ -2,12 +2,13 @@ import { Enemy } from "../enemy.js";
 
 export class ShooterEnemy extends Enemy {
     constructor(scene) {
-        super(scene); 
+        super(scene)
+        this.player = scene.player;
 
         this.shootTimer = 0;
-        this.fireRate = 1000;
-        this.projectileSpeed = 100;
-        
+        this.fireRate = 5000;
+        this.projectileSpeed = 650;
+
         this.bulletType = 'normal';
         this.spread = 0;
 
@@ -31,18 +32,18 @@ export class ShooterEnemy extends Enemy {
             this.x += speedX * dt;
             this.y += speedY * dt;
         }
-
-        if (this.shootTimer > 0) this.shootTimer -= dt;
+        if (this.shootTimer > 0) this.shootTimer -= dt * 1000;
         else this.shoot();
     }
 
     shoot() {
         this.shootTimer = this.fireRate;
-        const bullet = this.scene.bulletPool.get();
+        const bullet = this.scene.enemyBulletPool.get();
         if (bullet) {
             bullet.spawn(
                 this.x, this.y,
-                0, 0,
+                this.player.x - this.x,
+                this.player.y - this.y,
                 this.damage, this.projectileSpeed, this.bulletType, Math.max(0, this.spread)
             );
 

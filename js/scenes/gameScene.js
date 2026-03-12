@@ -6,6 +6,7 @@ import { BasicEnemy } from '../entities/enemies/basicEnemy.js';
 import { FastEnemy } from '../entities/enemies/fastEnemy.js';
 import { EliteEnemy } from '../entities/enemies/eliteEnemy.js';
 import { ShooterEnemy } from '../entities/enemies/shooterEnemy.js';
+import { TeleporterEnemy } from '../entities/enemies/teleporterEnemy.js';
 import { GuardEnemy } from '../entities/enemies/guardEnemy.js';
 import { BossEnemy } from '../entities/enemies/bossEnemy.js';
 import { ObjectPool } from "../core/objectPool.js";
@@ -22,17 +23,19 @@ export class GameScene {
         this.explosions = [];
 
         // Objektum poolok és entitások
-        this.bulletPool = new ObjectPool(Bullet, 200, this);
+        this.player = new Player(this);
+        this.playerBulletPool = new ObjectPool(Bullet, 200, this);
+        this.enemyBulletPool = new ObjectPool(Bullet, 200, this);
         this.enemyPools = {
             basic: new ObjectPool(BasicEnemy, 200, this),
-            fast: new ObjectPool(FastEnemy, 200, this), 
+            fast: new ObjectPool(FastEnemy, 200, this),
             elite: new ObjectPool(EliteEnemy, 100, this),
             shooter: new ObjectPool(ShooterEnemy, 50, this),
+            teleporter: new ObjectPool(TeleporterEnemy, 50, this),
             guard: new ObjectPool(GuardEnemy, 50, this),
             boss: new ObjectPool(BossEnemy, 5, this)
         }
         this.botPool = new ObjectPool(Bot, 10, this);
-        this.player = new Player(this);
 
         // Run statisztikák
         this.runCoins = 0;
@@ -114,7 +117,8 @@ export class GameScene {
 
             this.player.update(input, dt);
             this.botPool.updateAll(dt);
-            this.bulletPool.updateAll(dt);
+            this.playerBulletPool.updateAll(dt);
+            this.enemyBulletPool.updateAll(dt);
             Object.values(this.enemyPools).forEach(pool => pool.updateAll(dt));
 
             this.handleCollisions();
@@ -159,7 +163,7 @@ export class GameScene {
             case 0:
                 this.minSpawnInterval = 0.2;
                 if (levelTime > 20 && r > 0.8) return "fast";
-                return "shooter";
+                return "teleporter";
 
             case 1:
                 if (levelTime > 30 && r > 0.9) return "elite";
@@ -222,11 +226,10 @@ export class GameScene {
     }
 
     handleCollisions() {
-        // --- A: Lövedékek vs Ellenségek ---
-        this.bulletPool.pool.forEach(bullet => {
+        // --- A: Barátságos Lövedékek vs Ellenségek ---
+        this.playerBulletPool.pool.forEach(bullet => {
             if (!bullet.active) return;
 
-            // JAVÍTVA: foreach -> forEach
             Object.values(this.enemyPools).forEach(pool => {
                 pool.pool.forEach(enemy => {
                     if (enemy.active && !enemy.exploding) {
@@ -244,7 +247,6 @@ export class GameScene {
         });
 
         // --- B: Ellenségek vs Játékos ---
-        // JAVÍTVA: foreach -> forEach
         Object.values(this.enemyPools).forEach(pool => {
             pool.pool.forEach(enemy => {
                 if (enemy.active && !enemy.exploding) {
@@ -255,12 +257,30 @@ export class GameScene {
                 }
             });
         });
+
+        // --- C: Ellenséges Lövedékek vs Játékos/Bot ---
+        this.enemyBulletPool.pool.forEach(bullet => {
+            if (!bullet.active) return;
+
+            if (this.botPool.pool.length > 0) {
+                this.botPool.pool.forEach(bot => {
+                    if (this.physics.checkCollision(bullet, bot)) {
+                        bot.takeDamage(bullet.damage);
+                        bullet.active = false;
+                    }
+                });
+            }
+
+            if (this.physics.checkCollision(bullet, this.player)) {
+                this.player.takeDamage(bullet.damage);
+                bullet.active = false;
+            }
+        });
     }
 
     triggerExplosion(bullet) {
         this.engine.audio.sfx.explosion();
 
-        // JAVÍTVA: this.enemyPool.pool helyett a több poolt tartalmazó objektumon iterálunk végig
         Object.values(this.enemyPools).forEach(pool => {
             pool.pool.forEach(enemy => {
                 if (!enemy.active) return;
@@ -291,13 +311,13 @@ export class GameScene {
     draw(ctx) {
         this.engine.renderer.renderPlayer(this.player);
         this.botPool.pool.forEach(bot => this.engine.renderer.renderBot(bot));
-        
-        // JAVÍTVA: this.enemyPool.pool helyett az összes poolt végigiteráljuk
+
         Object.values(this.enemyPools).forEach(pool => {
             pool.pool.forEach(enemy => this.engine.renderer.renderEnemy(enemy));
         });
-        
-        this.bulletPool.pool.forEach(bullet => this.engine.renderer.renderBullet(bullet));
+
+        this.playerBulletPool.pool.forEach(bullet => this.engine.renderer.renderBullet(bullet));
+        this.enemyBulletPool.pool.forEach(bullet => this.engine.renderer.renderBullet(bullet));
 
         this.explosions.forEach(exp => {
             this.engine.renderer.renderExplosion(exp);

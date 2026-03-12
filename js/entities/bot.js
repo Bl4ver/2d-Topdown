@@ -74,7 +74,6 @@ export class Bot {
     update(dt) {
         if (!this.active) return;
 
-        // --- ÚJ: Timer csökkentése minden frame-ben ---
         if (this.shootTimer > 0) this.shootTimer -= dt;
 
         // 1. Keringési célpont kiszámolása
@@ -132,7 +131,7 @@ export class Bot {
             this.shootTimer = fireRateSec;
 
             // 4. Golyó lekérése és kilövése
-            const bullet = this.scene.bulletPool.get();
+            const bullet = this.scene.playerBulletPool.get();
             if (bullet) {
                 const spreadInRadians = Math.max(0, this.spread) * (Math.PI / 180);
 
@@ -148,6 +147,20 @@ export class Bot {
                 this.engine.audio.sfx.shoot();
             }
         }
+    }
+
+    takeDamage(damage) {
+        console.log(this.hp)
+        if (this.hp > 0)
+            this.hp -= damage;
+        if (this.hp <= 0) {
+            this.die();
+        }
+    }
+
+    die() {
+        if (!this.active || this.exploding) return;
+        this.active = false;
     }
 
     repair(dt) {

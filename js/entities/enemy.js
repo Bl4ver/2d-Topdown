@@ -8,7 +8,7 @@ export class Enemy {
         this.x = 0;
         this.y = 0;
         this.target = { x: 0, y: 0 };
-        this.active = false; // Alapból inaktív
+        this.active = false;
 
         this.angle = 0;
 
@@ -61,14 +61,12 @@ export class Enemy {
         this.type = template.type;
         this.level = template.level;
 
-        // Alaphelyzetbe állítjuk a robbanást, hátha egy újrahasznosított ellenség
         this.exploding = false;
         this.particles = [];
         this.active = true;
     }
 
     takeDamage(damage) {
-        // Ha inaktív, VAGY már épp robban (halott), ne kapjon több sebzést!
         if (!this.active || this.exploding) return;
 
         if (this.hp - damage > 0) {
@@ -98,11 +96,9 @@ export class Enemy {
 
         this.engine.audio.sfx.dieEnemy();
 
-        // INNEN JÖN AZ ÚJDONSÁG! Nem tűnik el egyből, hanem robban!
         this.exploding = true;
         this.particles = [];
 
-        // Generálunk 15 kis szilánkot
         for (let i = 0; i < 15; i++) {
             this.particles.push({
                 x: this.x,
@@ -110,10 +106,8 @@ export class Enemy {
                 // Véletlenszerű irány és sebesség (-250 és +250 között)
                 vx: (Math.random() - 0.5) * 500,
                 vy: (Math.random() - 0.5) * 500,
-                // Élettartam (1.0 = 100%, 0 = eltűnt)
-                life: 1.0,
-                // Véletlenszerű méret 2 és 6 pixel között
-                size: Math.random() * 4 + 2
+                life: 1.0, // Élettartam (1.0 = 100%, 0 = eltűnt)
+                size: Math.random() * 4 + 2 // Véletlenszerű méret 2 és 6 pixel között
             });
         }
     }
@@ -121,7 +115,6 @@ export class Enemy {
     update(dt) {
         if (!this.active) return;
 
-        // A robbanás logikája mindenkinél ugyanaz, ez maradhat itt
         if (this.exploding) {
             let allDead = true;
             this.particles.forEach(p => {
