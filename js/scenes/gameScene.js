@@ -74,43 +74,76 @@ export class GameScene {
 
     init() {
         this.engine.uiManager.showScreen("hud");
+        this.engine.isPaused = false;
+
+        // EGYETLEN ESEMÉNYKEZELŐ (Ez köti be a Pause menüt és a gombjait)
         this.engine.uiManager.bindButtonEvents({
-            onPause: () => this.engine.changeScene('menu')
+            onPause: () => {
+                console.log("Játék megállítva!"); // Képernyőre is ír a konzolban
+                this.engine.isPaused = true;
+                this.engine.uiManager.showScreen("pause-screen");
+            },
+            onResume: () => {
+                this.engine.isPaused = false;
+                this.engine.uiManager.showScreen("hud");
+            },
+            onPauseSettings: () => {
+                this.engine.uiManager.showScreen("settings-screen");
+            },
+            onSettingsBack: () => {
+                if (this.engine.currentSceneName === 'game' || this.engine.currentSceneName === 'testground') {
+                    this.engine.uiManager.showScreen("pause-screen");
+                } else {
+                    this.engine.changeScene("menu");
+                }
+            },
+            onQuit: () => this.quitGame()
         });
+
+        // Játékos inicializálása
         this.player.init(this.state, this.datas);
         this.player.spawn();
         this.player.active = true;
         this.player.hp = this.player.maxHp;
+
+        // Életerő csík frissítése
         let hpDisplay = document.getElementById("hp-fill");
         let hpText = document.getElementById("hp-val");
         if (hpDisplay) hpDisplay.style.width = "100%";
         if (hpText) hpText.innerText = "100%";
 
+        // Botok inicializálása
         this.state.inventory.activeBots.forEach(active => {
             if (!this.botPools[active]) return;
             this.botPools[active].get().init(active, this.state, this.datas);
         });
 
+        // Változók lenullázása
         this.runTime = 0;
         this.runScore = 0;
         this.runCoins = 0;
         this.spawnTimer = 0.5;
         this.startTime = performance.now();
 
-        // Szint adatok nullázása induláskor
         this.level = 0;
         this.levelStartTime = performance.now();
-
-        // Pause gomb beállítása
-        this.engine.uiManager.bindButtonEvents({
-            onPause: () => this.engine.changeScene(this.engine.previousSceneName)
-        });
 
         // UI lenullázása
         this.updateTimerUI();
         this.updateLevelUI();
         document.getElementById("score").innerText = "000000";
         document.getElementById("credits-val").innerText = "0";
+
+        // ITT VOLT A HIBÁS KÓD, AZT TELJESEN KITÖRÖLTEM INNEN!
+    }
+
+    quitGame() {
+        this.finalizeStats();
+        this.engine.isPaused = false;
+
+        document.getElementById("cheat-menu").classList.add("hidden");
+
+        this.engine.changeScene("menu");
     }
 
     update(input, dt) {

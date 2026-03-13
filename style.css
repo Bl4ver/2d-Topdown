@@ -339,14 +339,14 @@ html {
 }
 
 /* MARK: - GAME & HUD - */
-
 #gameCanvas {
     display: block;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at center, var(--bg-light-dark) 0%, var(--bg-dark) 100%);position: absolute;
+    background: radial-gradient(circle at center, var(--bg-light-dark) 0%, var(--bg-dark) 100%);
+    position: absolute;
     top: 0;
     left: 0;
     z-index: 1;
@@ -496,7 +496,7 @@ html {
     transform: rotate(-45deg);
 }
 
-.btn-pause {
+#btn-pause {
     z-index: 100;
 }
 
@@ -514,6 +514,187 @@ html {
     font-weight: 900;
     font-style: italic;
     color: white;
+}
+
+/* MARK: - PAUSE SCREEN - */
+.screen-pause {
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 200;
+    backdrop-filter: blur(10px);
+}
+
+.title-pause {
+    color: var(--neon-yellow);
+    text-shadow: 0 0 20px var(--neon-yellow);
+}
+
+.title-modes {
+    font-size: 6cqmin;
+}
+
+.panel-auto {
+    height: auto;
+    padding: 4cqmin;
+    gap: 20px;
+}
+
+.btn-full {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* Téma színek gombokhoz */
+.theme-blue {
+    border-color: var(--neon-light-blue) !important;
+    color: var(--neon-light-blue) !important;
+}
+
+.theme-blue:hover {
+    background: var(--neon-light-blue) !important;
+    color: black !important;
+    box-shadow: 0 0 20px var(--neon-light-blue);
+}
+
+.theme-green {
+    border-color: var(--neon-green) !important;
+    color: var(--neon-green) !important;
+}
+
+.theme-green:hover {
+    background: var(--neon-green) !important;
+    color: black !important;
+    box-shadow: 0 0 20px var(--neon-green);
+}
+
+.theme-pink {
+    border-color: var(--neon-pink) !important;
+    color: var(--neon-pink) !important;
+}
+
+.theme-pink:hover {
+    background: var(--neon-pink) !important;
+    color: black !important;
+    box-shadow: 0 0 20px var(--neon-pink);
+}
+
+.theme-yellow {
+    border-color: var(--neon-yellow) !important;
+    color: var(--neon-yellow) !important;
+}
+
+.theme-yellow:hover {
+    background: var(--neon-yellow) !important;
+    color: black !important;
+    box-shadow: 0 0 20px var(--neon-yellow);
+}
+
+.theme-gray {
+    border-color: var(--neon-gray) !important;
+    color: var(--neon-gray) !important;
+}
+
+.theme-gray:hover {
+    background: var(--neon-gray) !important;
+    color: black !important;
+    box-shadow: 0 0 20px var(--neon-gray);
+}
+
+.theme-purple {
+    border-color: var(--neon-purple) !important;
+    color: var(--neon-purple) !important;
+}
+
+.theme-purple:hover {
+    background: var(--neon-purple) !important;
+    color: black !important;
+    box-shadow: 0 0 20px var(--neon-purple);
+}
+
+/* MARK: - CHEAT MENU - */
+.cheat-menu-container {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 320px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: rgba(0, 255, 0, 0.05);
+    border: 1px solid var(--neon-green);
+    padding: 15px;
+    border-radius: 5px;
+    backdrop-filter: blur(10px);
+    z-index: 150;
+    font-family: monospace;
+}
+
+.cheat-menu-title {
+    color: var(--neon-green);
+    text-align: center;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px var(--neon-green);
+}
+
+.cheat-warning {
+    color: var(--neon-green);
+    font-size: 10px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.cheat-section {
+    margin-top: 15px;
+    border-top: 1px solid rgba(57, 255, 20, 0.3);
+    padding-top: 10px;
+}
+
+.cheat-label {
+    color: var(--neon-green);
+    font-size: 12px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.cheat-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.cheat-btn {
+    width: 100%;
+    padding: 8px;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.cheat-btn-small {
+    flex: 1 1 calc(50% - 5px);
+    padding: 5px;
+    font-size: 10px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cheat-btn-small:hover {
+    transform: scale(1.05);
+}
+
+/* Gördítősáv a cheat menühöz */
+.cheat-menu-container::-webkit-scrollbar {
+    width: 5px;
+}
+
+.cheat-menu-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.cheat-menu-container::-webkit-scrollbar-thumb {
+    background: var(--neon-green);
+    border-radius: 5px;
 }
 
 /* MARK: - UPGRADES & ENCYCLOPEDIA - */
@@ -735,6 +916,7 @@ input[type=range]::-webkit-slider-thumb {
     color: var(--neon-gray);
     letter-spacing: 2px;
 }
+
 .credits {
     color: var(--neon-yellow);
     font-size: 3.5cqmin;

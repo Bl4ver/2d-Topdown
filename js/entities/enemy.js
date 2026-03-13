@@ -53,7 +53,7 @@ export class Enemy {
         this.speed = template.speed;
         this.width = template.width;
         this.height = template.height;
-        this.radius = template.radius;
+        this.radius = (template.width / 2) + (template.height * 0.05);
         this.scoreValue = template.scoreValue;
         this.coinAmount = template.earnedCoin;
         this.rotationSpeed = template.rotationSpeed || 3;

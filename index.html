@@ -51,8 +51,8 @@
 
                 <div class="hud-right">
                     <div class="level-container">
-                        <div class="pause-diamond">
-                            <div class="pause-icon btn-pause"></div>
+                        <div id="btn-pause" class="pause-diamond">
+                            <div class="pause-icon"></div>
                         </div>
                         <div class="level-label">SZINT 01</div>
                     </div>
@@ -72,9 +72,60 @@
                 <button id="btn-statistics" class="button-menu">STATISTICS</button>
                 <button id="btn-encyclopedia" class="button-menu">ENCYCLOPEDIA</button>
                 <button id="btn-settings" class="button-menu">SETTINGS</button>
-                <button id="btn-testground" class="button-menu">TEST GROUND</button>
             </div>
         </section>
+
+        <!-- MARK: Game modes Screen -->
+        <section id="game-modes-screen" class="ui-screen hidden">
+            <h1 class="title title-modes">SELECT MODE</h1>
+            <div class="cyber-panel panel-auto">
+                <button id="btn-mode-normal" class="button-menu btn-full theme-blue">NORMAL PROTOCOL</button>
+                <button id="btn-mode-test" class="button-menu btn-full theme-green">TEST GROUND</button>
+                <button class="btn-back btn-full">[ RETURN ]</button>
+            </div>
+        </section>
+
+        <!-- MARK: Pause Screen -->
+        <section id="pause-screen" class="ui-screen screen-pause hidden">
+            <h1 class="title title-pause">PAUSED</h1>
+            <div class="cyber-panel panel-auto">
+                <button id="btn-resume" class="button-menu btn-full theme-blue">RESUME MISSION</button>
+                <button id="btn-pause-settings" class="button-menu btn-full theme-gray">SETTINGS</button>
+                <button id="btn-quit" class="button-menu btn-full theme-pink">ABORT & SAVE</button>
+            </div>
+        </section>
+
+        <!-- MARK: Testground Screen -->
+        <div id="cheat-menu" class="cheat-menu-container hidden">
+            <h3 class="cheat-menu-title">DEV CONSOLE</h3>
+
+            <div id="cheat-basic-container">
+                <button id="cheat-money" class="button-menu cheat-btn theme-yellow">+10.000 KREDIT</button>
+                <button id="cheat-heal" class="button-menu cheat-btn theme-pink">MAX ÉLETERŐ</button>
+            </div>
+
+            <div class="cheat-section">
+                <p class="cheat-label">SZINT UGRÁS (SET LEVEL):</p>
+                <div id="cheat-levels-container" class="cheat-grid"></div>
+            </div>
+
+            <div class="cheat-section">
+                <p class="cheat-label">FEGYVER FELSZERELÉS (EQUIP):</p>
+                <div id="cheat-weapons-container" class="cheat-grid"></div>
+            </div>
+
+            <div class="cheat-section">
+                <p class="cheat-label">BOT LEHÍVÁS (ADD BOT):</p>
+                <div id="cheat-bots-container" class="cheat-grid"></div>
+            </div>
+
+            <div class="cheat-section">
+                <p class="cheat-label">ELLENSÉG SPAWNOLÁS:</p>
+                <div id="cheat-enemies-container" class="cheat-grid"></div>
+            </div>
+
+            <p class="cheat-warning">[NINCS MENTÉS A TESZTPÁLYÁN]</p>
+        </div>
 
 
         <!-- MARK: Testground Screen -->
@@ -90,7 +141,7 @@
 
         <!-- MARK: Settings Screen -->
         <section id="settings-screen" class="ui-screen hidden">
-            <div class="cyber-panel">
+            <div class="cyber-panel panel-auto">
                 <h1 class="title">SETTINGS</h1>
                 <p class="description">- Cybercore Protocol: v1.0 -</p>
 
@@ -114,7 +165,7 @@
                     </div>
                 </div>
 
-                <button class="btn-back"> [ RETURN ] </button>
+                <button id="btn-settings-back" class="btn-back btn-full theme-pink">[ RETURN ]</button>
             </div>
         </section>
 

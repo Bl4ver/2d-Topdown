@@ -2,71 +2,138 @@ import { GameScene } from './gameScene.js';
 
 export class TestGroundScene extends GameScene {
     constructor(engine) {
-        // A super() lefuttatja a GameScene constructorát (betölti a poolokat, stb.)
-        super(engine); 
+        super(engine);
     }
 
     init() {
-        // 1. ELMENTJÜK AZ EREDETI ÁLLAPOTOT
         this.realState = this.engine.state;
-        
-        // 2. KÉSZÍTÜNK EGY KLÓNT: A játék motorja mostantól ezt a "hamis" mentést látja
         this.engine.state = JSON.parse(JSON.stringify(this.realState));
         this.state = this.engine.state;
 
-        // 3. Lefuttatjuk az eredeti GameScene init-jét a klónozott adatokkal
         super.init();
 
-        // 4. Teszt UI megjelenítése (később adjuk hozzá a HTML-hez)
-        const testUI = document.getElementById("test-ground-ui");
-        if (testUI) testUI.classList.remove("hidden");
+        document.getElementById("cheat-menu").classList.remove("hidden");
+
+        // Legeneráljuk a dinamikus UI-t
+        this.setupDynamicCheatMenu();
     }
 
-    update(input, dt) {
-        super.update(input, dt); // Fut a normál játék
-
-        // --- CHEAT KÓDOK / TESZT FUNKCIÓK ---
-        // Ha megnyomja a 'C' gombot, kap 10,000 kreditet
-        if (input.keys.c || input.keys.C) {
+    setupDynamicCheatMenu() {
+        // --- 1. Alap Cheatek (Pénz, HP) ---
+        document.getElementById("cheat-money").onclick = () => {
             this.engine.state.coins += 10000;
             this.runCoins += 10000;
             document.getElementById("credits-val").innerText = this.runCoins;
-            input.keys.c = false; // Ne spamelje szét másodpercenként 60-szor
-            input.keys.C = false;
-        }
+        };
 
-        // Ha megnyomja a 'H' gombot, visszatölti a HP-t maxra
-        if (input.keys.h || input.keys.H) {
+        document.getElementById("cheat-heal").onclick = () => {
             this.player.hp = this.player.maxHp;
-            this.player.updateUI();
-            input.keys.h = false;
-            input.keys.H = false;
+            let hpDisplay = document.getElementById("hp-fill");
+            let hpText = document.getElementById("hp-val");
+            if (hpDisplay) hpDisplay.style.width = "100%";
+            if (hpText) hpText.innerText = "100%";
+        };
+
+        // Segédfüggvény a gombok HTML generálásához
+        const createCheatBtn = (text, themeClass, onClickHandler) => {
+            const btn = document.createElement("button");
+            // A gomb megkapja az alap osztályokat ÉS a szín témát
+            btn.className = `button-menu cheat-btn-small ${themeClass}`;
+            btn.innerText = text.toUpperCase();
+            btn.onclick = onClickHandler;
+            return btn;
+        };
+
+        // --- 2. DINAMIKUS SZINTEK ---
+        const levelsContainer = document.getElementById("cheat-levels-container");
+        levelsContainer.innerHTML = '';
+        for (let i = 0; i <= this.scoreThresholds.length; i++) {
+            // Itt a 'theme-blue' CSS osztályt adjuk át
+            const btn = createCheatBtn(`Szint ${i + 1}`, 'theme-blue', () => {
+                this.level = i;
+                this.levelStartTime = performance.now();
+                this.runScore = i === 0 ? 0 : this.scoreThresholds[i - 1];
+                document.getElementById("score").innerText = this.runScore.toString().padStart(6, '0');
+                this.updateLevelUI();
+                Object.values(this.enemyPools).forEach(pool => pool.releaseAll());
+            });
+            levelsContainer.appendChild(btn);
         }
 
-        // Ha megnyomja az 'L' gombot, azonnal szintet lép
-        if (input.keys.l || input.keys.L) {
-            this.runScore = this.scoreThresholds[this.level] || this.runScore + 10000;
-            input.keys.l = false;
-            input.keys.L = false;
+        // --- 3. DINAMIKUS FEGYVEREK ---
+        const weaponsContainer = document.getElementById("cheat-weapons-container");
+        weaponsContainer.innerHTML = '';
+        if (this.datas && this.datas.weapons) {
+            Object.keys(this.datas.weapons).forEach(weaponKey => {
+                const btn = createCheatBtn(weaponKey, 'theme-yellow', () => {
+                    // 1. Unlockoljuk a mentésben
+                    if (!this.state.inventory.weapons[weaponKey]) {
+                        this.state.inventory.weapons[weaponKey] = { unlocked: true, level: 1 };
+                    }
+
+                    // 2. ERŐSZAKOS CSERE A JÁTÉKOSON:
+                    this.player.currentWeapon = weaponKey; // Beállítjuk a kulcsot
+                    this.player.weaponData = this.datas.weapons[weaponKey]; // Frissítjük a statokat
+
+                    // Ha van esetleg tüzelés időzítőd a Player-ben, azt lenullázzuk:
+                    if (this.player.fireTimer !== undefined) this.player.fireTimer = 0;
+                    if (this.player.lastShotTime !== undefined) this.player.lastShotTime = 0;
+
+                    console.log(`Fegyver sikeresen lecserélve erre: ${weaponKey}`);
+                });
+                weaponsContainer.appendChild(btn);
+            });
+        }
+
+        // --- 4. DINAMIKUS BOTOK ---
+        const botsContainer = document.getElementById("cheat-bots-container");
+        botsContainer.innerHTML = '';
+        if (this.datas && this.datas.bots) {
+            Object.keys(this.datas.bots).forEach(botKey => {
+                const btn = createCheatBtn(botKey, 'theme-green', () => {
+                    if (!this.state.inventory.activeBots.includes(botKey)) {
+                        this.state.inventory.activeBots.push(botKey);
+                    }
+                    if (this.botPools[botKey]) {
+                        const bot = this.botPools[botKey].get();
+                        bot.init(botKey, this.state, this.datas);
+                    }
+                });
+                botsContainer.appendChild(btn);
+            });
+        }
+
+        // --- 5. DINAMIKUS ELLENSÉGEK ---
+        const enemiesContainer = document.getElementById("cheat-enemies-container");
+        enemiesContainer.innerHTML = '';
+        if (this.datas && this.datas.enemies) {
+            Object.keys(this.datas.enemies).forEach(enemyKey => {
+                const enemyData = this.datas.enemies[enemyKey];
+                const poolType = enemyData.type;
+
+                // Téma meghatározás típustól függően CSS osztállyal
+                let theme = 'theme-purple';
+                if (poolType === 'boss') theme = 'theme-pink';
+                if (poolType === 'kamikaze') theme = 'theme-yellow';
+
+                const btn = createCheatBtn(enemyKey, theme, () => {
+                    if (this.enemyPools[poolType]) {
+                        const enemy = this.enemyPools[poolType].get();
+                        if (enemy) enemy.spawn(enemyKey);
+                    }
+                });
+                enemiesContainer.appendChild(btn);
+            });
         }
     }
 
-    // EZ A LEGFONTOSABB RÉSZ: Felülírjuk az eredeti mentési logikát!
+    update(input, dt) {
+        super.update(input, dt);
+    }
+
     finalizeStats() {
-        // 1. Kiszámoljuk a tesztpályán töltött időt, és hozzáadjuk az EREDETI mentéshez
-        if (!this.realState.statistics.testGroundTime) {
-            this.realState.statistics.testGroundTime = 0;
-        }
-        this.realState.statistics.testGroundTime += this.runTime;
-
-        // 2. Visszaállítjuk az eredeti mentést (a klónt a sok pénzzel kidobjuk)
+        console.log("TEST GROUND KILÉPÉS - SEMMIT NEM MENTÜNK!");
         this.engine.state = this.realState;
-        
-        // 3. Elmentjük az eredeti state-et (amiben csak a testGroundTime nőtt)
-        this.engine.save();
-
-        // 4. Elrejtjük a teszt UI-t
-        const testUI = document.getElementById("test-ground-ui");
-        if (testUI) testUI.classList.add("hidden");
+        document.getElementById("cheat-menu").classList.add("hidden");
     }
 }

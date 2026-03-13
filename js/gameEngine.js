@@ -35,6 +35,7 @@ export class GameEngine {
         this.currentSceneName = null;
         this.previousSceneName = null;
         this.currentScene = null;
+        this.isPaused = false;
     }
 
     // --- JÁTÉK INDÍTÁSA ---
@@ -70,18 +71,24 @@ export class GameEngine {
     }
 
     loop(timestamp) {
-        const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1);
-        this.lastTime = timestamp;
+    const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1);
+    this.lastTime = timestamp;
 
-        if (this.currentScene) {
-            if (this.currentScene.update) this.currentScene.update(this.input, dt);
-
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            if (this.currentScene.draw) this.currentScene.draw(this.ctx);
+    if (this.currentScene) {
+        // CSAK AKKOR frissítjük a logikát, ha nincs megállítva a játék
+        if (this.currentScene.update && !this.isPaused) {
+            this.currentScene.update(this.input, dt);
         }
 
-        requestAnimationFrame((t) => this.loop(t));
+        // A kirajzolás viszont mindig megy, hogy lássuk a játék képét a szünet menü mögött
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (this.currentScene.draw) {
+            this.currentScene.draw(this.ctx);
+        }
     }
+
+    requestAnimationFrame((t) => this.loop(t));
+}
 
     update(dt) {
         if (this.currentScene && this.currentScene.update) {

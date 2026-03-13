@@ -1,26 +1,27 @@
-export class MenuScene{
-    constructor(engine){
+export class MenuScene {
+    constructor(engine) {
         this.engine = engine;
     }
 
-    init(){
+    init() {
         this.engine.uiManager.showScreen("main-menu");
         this.engine.uiManager.bindButtonEvents({
-            onStart: () => this.engine.changeScene("game"),
-            onTestground: () => this.engine.changeScene("testground"),
+            onStart: () => this.engine.uiManager.showScreen("game-modes-screen"),
+            onModeNormal: () => this.engine.changeScene("game"),
+            onModeTest: () => this.engine.changeScene("testground"),
             onSettings: () => this.engine.changeScene("settings"),
             onUpgrades: () => this.engine.changeScene("upgrades"),
             onEncyclopedia: () => this.engine.changeScene("encyclopedia"),
             onStatistics: () => this.engine.changeScene("statistics"),
-            onBack: () => this.engine.changeScene("back")
+            onBack: () => this.engine.uiManager.showScreen("main-menu")
         });
     }
 
-    update(){
+    update() {
 
     }
 
-    draw(){
+    draw() {
 
     }
 }
