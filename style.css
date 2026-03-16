@@ -464,6 +464,11 @@ html {
     pointer-events: auto;
 }
 
+#fps-display{
+    color: var(--neon-light-blue);
+    text-align: right;
+}
+
 .level-container {
     display: flex;
     align-items: center;

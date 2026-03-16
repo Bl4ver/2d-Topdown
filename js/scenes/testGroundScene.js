@@ -3,56 +3,114 @@ import { GameScene } from './gameScene.js';
 export class TestGroundScene extends GameScene {
     constructor(engine) {
         super(engine);
+        this.isImmortal = true; 
+        this.wavesEnabled = false; // Új változó a hullámok követésére (Alapból kikapcsolva a tesztpályán!)
     }
 
-    init() {
-        this.realState = this.engine.state;
-        this.engine.state = JSON.parse(JSON.stringify(this.realState));
-        this.state = this.engine.state;
+    init(state, datas) {
+        this.state = state;
+        this.datas = datas;
 
-        super.init();
+        this.realState = this.state;
+        
+        // Klónozás, hogy a cheat menu ne rontsa el a mentést
+        this.engine.dataManager.state = JSON.parse(JSON.stringify(this.realState));
+        this.state = this.engine.dataManager.state;
+
+        super.init(this.state, this.datas);
+
+        // --- HALHATATLANSÁG ÉS WAVE BEÁLLÍTÁSOK ---
+        this.isImmortal = true; 
+        this.wavesEnabled = false; // Alapból legyen csend és béke a tesztpályán
+
+        // 1. Felülírjuk a játékos sebződését
+        const originalTakeDamage = this.player.takeDamage.bind(this.player);
+        this.player.takeDamage = (dmg) => {
+            if (this.isImmortal) return; 
+            originalTakeDamage(dmg);
+        };
+
+        // 2. Felülírjuk az UI frissítőt
+        const originalUpdateUI = this.player.updateUI.bind(this.player);
+        this.player.updateUI = () => {
+            originalUpdateUI(); 
+            if (this.isImmortal) {
+                const hpText = document.getElementById("hp-val");
+                if (hpText) hpText.innerText = "VÉGTELEN";
+            }
+        };
+
+        this.player.updateUI();
 
         document.getElementById("cheat-menu").classList.remove("hidden");
-
-        // Legeneráljuk a dinamikus UI-t
         this.setupDynamicCheatMenu();
+        
+        // Mivel alapból kikapcsoltuk a wave-eket, töröljük le az esetlegesen már lespawnolt kezdő ellenségeket
+        if (!this.wavesEnabled) {
+            Object.values(this.enemyPools).forEach(pool => pool.releaseAll());
+        }
     }
 
     setupDynamicCheatMenu() {
-        // --- 1. Alap Cheatek (Pénz, HP) ---
         document.getElementById("cheat-money").onclick = () => {
-            this.engine.state.coins += 10000;
+            this.state.coins += 10000;
             this.runCoins += 10000;
             document.getElementById("credits-val").innerText = this.runCoins;
         };
 
-        document.getElementById("cheat-heal").onclick = () => {
-            this.player.hp = this.player.maxHp;
-            let hpDisplay = document.getElementById("hp-fill");
-            let hpText = document.getElementById("hp-val");
-            if (hpDisplay) hpDisplay.style.width = "100%";
-            if (hpText) hpText.innerText = "100%";
-        };
+        const healBtn = document.getElementById("cheat-heal");
+        if (healBtn) {
+            healBtn.innerText = "MÓD: HALHATATLAN";
+            healBtn.onclick = () => {
+                this.isImmortal = !this.isImmortal; 
+                
+                if (this.isImmortal) {
+                    healBtn.innerText = "MÓD: HALHATATLAN";
+                    this.player.hp = this.player.maxHp; 
+                } else {
+                    healBtn.innerText = "MÓD: NORMÁL HP";
+                }
+                this.player.updateUI(); 
+            };
+        }
 
-        // Segédfüggvény a gombok HTML generálásához
         const createCheatBtn = (text, themeClass, onClickHandler) => {
             const btn = document.createElement("button");
-            // A gomb megkapja az alap osztályokat ÉS a szín témát
             btn.className = `button-menu cheat-btn-small ${themeClass}`;
             btn.innerText = text.toUpperCase();
             btn.onclick = onClickHandler;
             return btn;
         };
 
-        // --- 2. DINAMIKUS SZINTEK ---
+        // --- ÚJ: WAVES KAPCSOLÓ ---
         const levelsContainer = document.getElementById("cheat-levels-container");
         levelsContainer.innerHTML = '';
-        for (let i = 0; i <= this.scoreThresholds.length; i++) {
-            // Itt a 'theme-blue' CSS osztályt adjuk át
+        
+        const wavesBtn = createCheatBtn("WAVES: KIKAPCSOLVA", "theme-red", () => {
+            this.wavesEnabled = !this.wavesEnabled;
+            
+            if (this.wavesEnabled) {
+                wavesBtn.innerText = "WAVES: BEKAPCSOLVA";
+                wavesBtn.classList.replace("theme-red", "theme-green"); // Kis vizuális visszajelzés
+                this.spawnTimer = 0.5; // Rögtön indítjuk a spawner-t
+            } else {
+                wavesBtn.innerText = "WAVES: KIKAPCSOLVA";
+                wavesBtn.classList.replace("theme-green", "theme-red");
+                // Azonnal takarítjuk a pályát, ha kikapcsoljuk
+                Object.values(this.enemyPools).forEach(pool => pool.releaseAll());
+            }
+        });
+        // Kicsit kiemeljük a többi közül
+        wavesBtn.style.marginBottom = "10px";
+        wavesBtn.style.width = "100%";
+        levelsContainer.appendChild(wavesBtn);
+
+        // --- 2. DINAMIKUS SZINTEK ---
+        for (let i = 0; i <= this.levelManager.scoreThresholds.length; i++) {
             const btn = createCheatBtn(`Szint ${i + 1}`, 'theme-blue', () => {
-                this.level = i;
-                this.levelStartTime = performance.now();
-                this.runScore = i === 0 ? 0 : this.scoreThresholds[i - 1];
+                this.levelManager.level = i;
+                this.levelManager.levelStartTime = performance.now();
+                this.runScore = i === 0 ? 0 : this.levelManager.scoreThresholds[i - 1];
                 document.getElementById("score").innerText = this.runScore.toString().padStart(6, '0');
                 this.updateLevelUI();
                 Object.values(this.enemyPools).forEach(pool => pool.releaseAll());
@@ -66,20 +124,13 @@ export class TestGroundScene extends GameScene {
         if (this.datas && this.datas.weapons) {
             Object.keys(this.datas.weapons).forEach(weaponKey => {
                 const btn = createCheatBtn(weaponKey, 'theme-yellow', () => {
-                    // 1. Unlockoljuk a mentésben
                     if (!this.state.inventory.weapons[weaponKey]) {
                         this.state.inventory.weapons[weaponKey] = { unlocked: true, level: 1 };
                     }
+                    this.player.currentWeapon = weaponKey; 
+                    this.player.weaponData = this.datas.weapons[weaponKey]; 
 
-                    // 2. ERŐSZAKOS CSERE A JÁTÉKOSON:
-                    this.player.currentWeapon = weaponKey; // Beállítjuk a kulcsot
-                    this.player.weaponData = this.datas.weapons[weaponKey]; // Frissítjük a statokat
-
-                    // Ha van esetleg tüzelés időzítőd a Player-ben, azt lenullázzuk:
-                    if (this.player.fireTimer !== undefined) this.player.fireTimer = 0;
-                    if (this.player.lastShotTime !== undefined) this.player.lastShotTime = 0;
-
-                    console.log(`Fegyver sikeresen lecserélve erre: ${weaponKey}`);
+                    if (this.player.shootTimer !== undefined) this.player.shootTimer = 0;
                 });
                 weaponsContainer.appendChild(btn);
             });
@@ -111,7 +162,6 @@ export class TestGroundScene extends GameScene {
                 const enemyData = this.datas.enemies[enemyKey];
                 const poolType = enemyData.type;
 
-                // Téma meghatározás típustól függően CSS osztállyal
                 let theme = 'theme-purple';
                 if (poolType === 'boss') theme = 'theme-pink';
                 if (poolType === 'kamikaze') theme = 'theme-yellow';
@@ -125,15 +175,60 @@ export class TestGroundScene extends GameScene {
                 enemiesContainer.appendChild(btn);
             });
         }
+
+        // --- 6. STRESSZ TESZT (FPS GYILKOS) ---
+        if (this.datas && this.datas.enemies) {
+            const stressBtn = createCheatBtn("FPS TESZT (500 ELLENSÉG)", "theme-red", () => {
+                const enemyKeys = Object.keys(this.datas.enemies);
+                if (enemyKeys.length === 0) return;
+
+                for (let i = 0; i < 500; i++) {
+                    const randomKey = enemyKeys[Math.floor(Math.random() * enemyKeys.length)];
+                    const enemyData = this.datas.enemies[randomKey];
+                    const poolType = enemyData.type;
+
+                    if (this.enemyPools[poolType]) {
+                        const enemy = this.enemyPools[poolType].get();
+                        if (enemy) enemy.spawn(randomKey);
+                    }
+                }
+            });
+            stressBtn.style.marginTop = "15px";
+            stressBtn.style.border = "2px solid red";
+            enemiesContainer.appendChild(stressBtn);
+        }
     }
 
     update(input, dt) {
+        // TRÜKK: Ha nincsenek engedélyezve a wave-ek, mesterségesen magasan tartjuk az időzítőt,
+        // így a GameScene "update" függvénye sosem fog magától ellenfelet generálni.
+        if (!this.wavesEnabled) {
+            this.spawnTimer = 100;
+        }
+
         super.update(input, dt);
+
+        if (input.keys.l || input.keys.L) {
+            const currentLevel = this.levelManager.level;
+            this.runScore = this.levelManager.scoreThresholds[currentLevel] || this.runScore + 10000;
+            input.keys.l = false;
+            input.keys.L = false;
+        }
+
+        if (input.keys.k || input.keys.K) {
+            const currentLevel = this.levelManager.level;
+            if (currentLevel > 0) {
+                this.runScore -= this.levelManager.scoreThresholds[currentLevel - 1] || 10000;
+            } else {
+                this.runScore = 0;
+            }
+            input.keys.k = false;
+            input.keys.K = false;
+        }
     }
 
     finalizeStats() {
-        console.log("TEST GROUND KILÉPÉS - SEMMIT NEM MENTÜNK!");
-        this.engine.state = this.realState;
+        this.engine.dataManager.state = this.realState; 
         document.getElementById("cheat-menu").classList.add("hidden");
     }
 }

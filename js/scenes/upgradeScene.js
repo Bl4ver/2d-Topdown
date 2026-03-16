@@ -3,10 +3,13 @@ export class UpgradeScene {
         this.engine = engine;
     }
 
-    init() {
+    init(state, datas) {
+        this.state = state;
+        this.datas = datas;
+
         this.engine.uiManager.showScreen('upgrades-screen');
         this.engine.uiManager.bindButtonEvents({
-            onBack: () => this.engine.changeScene('menu')
+            onBack: () => this.engine.sceneManager.changeScene('menu')
         });
 
         this.setupTabs();
@@ -30,17 +33,16 @@ export class UpgradeScene {
     // --- LOGIKA ---
 
     upgradePlayerStat(key) {
-        const data = this.engine.datas.playerUpgrades[key];
-        const currentLevel = this.engine.state.upgrades[key + "Level"] || 1;
+        const data = this.datas.playerUpgrades[key];
+        const currentLevel = this.state.upgrades[key + "Level"] || 1;
         const cost = data.baseCost * currentLevel;
 
-        if (this.engine.state.coins >= cost) {
-            this.engine.state.coins -= cost;
-
-            this.engine.state.upgrades[key + "Level"] = currentLevel + 1;
+        if (this.state.coins >= cost) {
+            this.state.coins -= cost;
+            this.state.upgrades[key + "Level"] = currentLevel + 1;
 
             this.engine.audio.sfx.upgrade();
-            this.engine.save();
+            this.engine.dataManager.save();
             this.updateUI();
         }
     }
@@ -48,24 +50,24 @@ export class UpgradeScene {
     upgradeStat(id, statKey, type) {
         switch (type) {
             case "weapon": {
-                const weaponData = this.engine.datas.weapons[id];
-                const weaponState = this.engine.state.inventory.weapons[id];
+                const weaponData = this.datas.weapons[id];
+                const weaponState = this.state.inventory.weapons[id];
                 const cost = weaponData.upgrades[statKey].baseCost * weaponState.levels[statKey];
 
-                if (this.engine.state.coins >= cost) {
-                    this.engine.state.coins -= cost;
+                if (this.state.coins >= cost) {
+                    this.state.coins -= cost;
                     weaponState.levels[statKey]++;
                 }
                 break;
             }
 
             case "bot": {
-                const botData = this.engine.datas.bots[id];
-                const botState = this.engine.state.inventory.bots[id];
+                const botData = this.datas.bots[id];
+                const botState = this.state.inventory.bots[id];
                 const cost = botData.upgrades[statKey].baseCost * botState.levels[statKey];
 
-                if (this.engine.state.coins >= cost) {
-                    this.engine.state.coins -= cost;
+                if (this.state.coins >= cost) {
+                    this.state.coins -= cost;
                     botState.levels[statKey]++;
                 }
                 break;
@@ -73,66 +75,62 @@ export class UpgradeScene {
         }
 
         this.engine.audio.sfx.upgrade();
-        this.engine.save();
+        this.engine.dataManager.save();
         this.updateUI();
-
     }
 
     unlock(id, type) {
-
-        console.log(SVGUnitTypes)
         switch (type) {
             case "weapon": {
-                const weapon = this.engine.datas.weapons[id];
-                if (this.engine.state.coins >= weapon.unlockCost) {
-                    this.engine.state.coins -= weapon.unlockCost;
-                    this.engine.state.inventory.weapons[id].unlocked = true;
-                    break;
+                const weapon = this.datas.weapons[id];
+                if (this.state.coins >= weapon.unlockCost) {
+                    this.state.coins -= weapon.unlockCost;
+                    this.state.inventory.weapons[id].unlocked = true;
                 }
+                break;
             }
 
             case "bot": {
-                const bot = this.engine.datas.bots[id];
-                if (this.engine.state.coins >= bot.unlockCost) {
-                    this.engine.state.coins -= bot.unlockCost;
-                    this.engine.state.inventory.bots[id].unlocked = true;
-                    break;
+                const bot = this.datas.bots[id];
+                if (this.state.coins >= bot.unlockCost) {
+                    this.state.coins -= bot.unlockCost;
+                    this.state.inventory.bots[id].unlocked = true;
                 }
+                break;
             }
         }
 
         this.engine.audio.sfx.upgrade();
-        this.engine.save();
+        this.engine.dataManager.save();
         this.updateUI();
-
     }
 
     equip(id, type) {
         switch (type) {
             case "weapon": {
-                this.engine.state.inventory.activeWeapon = id;
-                console.log(this.engine.state.inventory.activeWeapon, "equipped");
+                this.state.inventory.activeWeapon = id;
+                console.log(this.state.inventory.activeWeapon, "equipped");
                 break;
             }
             case "bot": {
-                if (this.engine.state.inventory.activeBots.includes(id)) {
-                    this.engine.state.inventory.activeBots = this.engine.state.inventory.activeBots.filter(botId => botId !== id);
-
+                if (this.state.inventory.activeBots.includes(id)) {
+                    this.state.inventory.activeBots = this.state.inventory.activeBots.filter(botId => botId !== id);
+                } else {
+                    this.state.inventory.activeBots.push(id);
                 }
-                else this.engine.state.inventory.activeBots.push(id);
                 break;
             }
         }
 
         this.engine.audio.sfx.equip();
-        this.engine.save();
+        this.engine.dataManager.save();
         this.updateUI();
     }
 
     // --- RENDERELÉS ---
 
     updateUI() {
-        document.getElementById('upgrade-coins-val').innerText = Math.floor(this.engine.state.coins);
+        document.getElementById('upgrade-coins-val').innerText = Math.floor(this.state.coins);
         this.renderPlayerUpgrades();
         this.renderWeapons();
         this.renderBots();
@@ -140,14 +138,14 @@ export class UpgradeScene {
 
     renderPlayerUpgrades() {
         const container = document.getElementById('playerUpgrades-container');
-        const upgradesData = this.engine.datas?.playerUpgrades;
+        const upgradesData = this.datas?.playerUpgrades;
         if (!container || !upgradesData) return;
 
         container.innerHTML = Object.entries(upgradesData).map(([key, data]) => {
-            const lvl = this.engine.state.upgrades[key + "Level"] || 1;
+            const lvl = this.state.upgrades[key + "Level"] || 1;
             const cost = data.baseCost * lvl;
-            const value = data.inc
-            const canAfford = this.engine.state.coins >= cost;
+            const value = data.inc;
+            const canAfford = this.state.coins >= cost;
 
             return `
                 <div class="card">
@@ -164,28 +162,28 @@ export class UpgradeScene {
 
     renderWeapons() {
         const container = document.getElementById('weapons-container');
-        if (!container || !this.engine.datas?.weapons) return;
+        if (!container || !this.datas?.weapons) return;
 
-        container.innerHTML = Object.entries(this.engine.datas.weapons).map(([id, data]) => {
-            const state = this.engine.state.inventory.weapons[id];
-            const isActive = this.engine.state.inventory.activeWeapon === id;
+        container.innerHTML = Object.entries(this.datas.weapons).map(([id, data]) => {
+            const wState = this.state.inventory.weapons[id];
+            const isActive = this.state.inventory.activeWeapon === id;
 
-            if (!state.unlocked) {
+            if (!wState.unlocked) {
                 return `
                     <div class="card">
                         <h3>${id.toUpperCase()}</h3>
                         <p>Ár: ${data.unlockCost} ¤</p>
-                        <button class="${this.engine.state.coins >= data.unlockCost ? 'btn-buy' : 'btn-disabled'}" 
+                        <button class="${this.state.coins >= data.unlockCost ? 'btn-buy' : 'btn-disabled'}" 
                                 data-action="w-unlock" data-id="${id}">FELOLDÁS</button>
                     </div>`;
             }
 
             const statsHtml = Object.entries(data.upgrades).map(([sKey, sData]) => {
-                const cost = sData.baseCost * state.levels[sKey];
+                const cost = sData.baseCost * wState.levels[sKey];
                 return `
                     <div class="upgrade-row">
-                        <span class="upgrade-label">${sData.name} (Lv${state.levels[sKey]})</span>
-                        <button class="btn-upgrade-stat ${this.engine.state.coins >= cost ? 'btn-buy' : 'btn-disabled'}" 
+                        <span class="upgrade-label">${sData.name} (Lv${wState.levels[sKey]})</span>
+                        <button class="btn-upgrade-stat ${this.state.coins >= cost ? 'btn-buy' : 'btn-disabled'}" 
                                 data-action="w-upg" data-id="${id}" data-stat="${sKey}">${cost} ¤</button>
                     </div>`;
             }).join('');
@@ -204,31 +202,30 @@ export class UpgradeScene {
 
     renderBots() {
         const container = document.getElementById('bots-container');
-        if (!container || !this.engine.datas?.bots) return;
+        if (!container || !this.datas?.bots) return;
 
-        // key = repair_bot     value = unlockCost
-        container.innerHTML = Object.entries(this.engine.datas.bots).map(([key, value]) => {
-            const state = this.engine.state.inventory.bots[key];
-            const isActive = this.engine.state.inventory.activeBots.includes(key);
+        container.innerHTML = Object.entries(this.datas.bots).map(([key, value]) => {
+            const bState = this.state.inventory.bots[key];
+            const isActive = this.state.inventory.activeBots.includes(key);
 
-            if (!state.unlocked) {
+            if (!bState.unlocked) {
                 return `
                     <div class="card">
                         <h3>${key.toUpperCase()}</h3>
                         <p>Ár: ${value.unlockCost} ¤</p>
-                        <button class="${this.engine.state.coins >= value.unlockCost ? 'btn-buy' : 'btn-disabled'}" 
+                        <button class="${this.state.coins >= value.unlockCost ? 'btn-buy' : 'btn-disabled'}" 
                                 data-action="b-unlock" data-id="${key}">FELOLDÁS</button>
                     </div>`;
             }
             const statsHtml = Object.entries(value.upgrades)
                 .filter(([sKey, sValue]) => sValue.baseCost !== undefined)
                 .map(([sKey, sValue]) => {
-                    const currentLevel = state.levels[sKey] || 1;
+                    const currentLevel = bState.levels[sKey] || 1;
                     const cost = sValue.baseCost * currentLevel;
                     return `
                         <div class="upgrade-row">
                             <span class="upgrade-label">${sKey} (Lv${currentLevel})</span>
-                            <button class="btn-upgrade-stat ${this.engine.state.coins >= cost ? 'btn-buy' : 'btn-disabled'}" 
+                            <button class="btn-upgrade-stat ${this.state.coins >= cost ? 'btn-buy' : 'btn-disabled'}" 
                                     data-action="b-upg" data-id="${key}" data-stat="${sKey}">${cost} ¤</button>
                         </div>`;
                 }).join('');
@@ -243,7 +240,6 @@ export class UpgradeScene {
                 </div>`;
         }).join('');
         this.bindCardEvents(container);
-
     }
 
     bindCardEvents(container) {

@@ -1,8 +1,7 @@
-// enemy.js
 export class Enemy {
     constructor(scene) {
-        this.engine = scene.engine;
         this.scene = scene;
+        this.engine = scene.engine;
         this.canvas = this.engine.canvas;
         this.ctx = this.engine.ctx;
 
@@ -11,7 +10,6 @@ export class Enemy {
         this.active = false;
         this.angle = 0;
 
-        // Adatok
         this.hp = 0;
         this.maxHp = 0;
         this.damage = 0;
@@ -31,6 +29,7 @@ export class Enemy {
     }
 
     spawn(name) {
+        // A scene.datas-t használjuk (amit a GameScene kap meg)
         const template = this.scene.datas?.enemies?.[name];
         if (!template) return console.error(`Adatok nem elérhetőek: ${name}`);
 
@@ -80,6 +79,7 @@ export class Enemy {
     die() {
         if (!this.active || this.exploding) return;
 
+        // A GameEngine-ben létrehozott "get state()" miatt a this.engine.state tökéletesen működik
         this.engine.state.statistics.enemiesKilled += 1;
         this.engine.state.statistics.totalScore += this.scoreValue;
         this.engine.state.highScore = Math.max(this.engine.state.highScore, this.scene.runScore + this.scoreValue);
@@ -114,16 +114,13 @@ export class Enemy {
     update(dt) {
         if (!this.active) return;
 
-        // --- FORGÁS LOGIKA ---
         if (!this.exploding) {
             this.angle += this.rotationSpeed * dt;
-
             if (this.angle >= Math.PI * 2) {
                 this.angle -= Math.PI * 2;
             }
         }
 
-        // --- RÉSZECSKÉK (ROBBANÁS) KEZELÉSE ---
         if (this.exploding) {
             let allDead = true;
             this.particles.forEach(p => {

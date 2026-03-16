@@ -23,6 +23,7 @@ export class UIManager {
 
         // Játékmód választó gombok
         if (callbacks.onModeNormal) document.getElementById('btn-mode-normal').onclick = callbacks.onModeNormal;
+        if (callbacks.onModeChallenge) document.getElementById('btn-mode-challenge').onclick = callbacks.onModeChallenge;
         if (callbacks.onModeTest) document.getElementById('btn-mode-test').onclick = callbacks.onModeTest;
 
         // Szünet menü gombok

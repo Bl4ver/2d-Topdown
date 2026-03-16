@@ -24,19 +24,12 @@ export class Bullet {
         this.speed = speed;
         this.type = type;
 
-        // Ha homing, legyen robbanási sugara (pl. 100 pixel)
         this.explosionRadius = (type === "homing") ? 100 : 0;
 
         let angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * spread;
         this.speedX = Math.cos(angle) * this.speed;
         this.speedY = Math.sin(angle) * this.speed;
         this.active = true;
-
-        /*
-        const magnitude = Math.sqrt(dx * dx + dy * dy);
-        this.speedX = (dx / magnitude) * this.speed; 
-        this.speedY = (dy / magnitude) * this.speed;
-        */
     }
 
     update(dt) {
@@ -49,6 +42,7 @@ export class Bullet {
                     if (d < minDist) { minDist = d; target = e; }
                 });
             });
+            
             if (target) {
                 const desired = Math.atan2(target.y - this.y, target.x - this.x);
                 let current = Math.atan2(this.speedY, this.speedX);
@@ -60,46 +54,12 @@ export class Bullet {
                 this.speedY = Math.sin(current) * this.speed;
             }
         }
-        this.x += this.speedX * dt; this.y += this.speedY * dt;
-        if (this.x < 0 || this.x > this.scene.engine.canvas.width || this.y < 0 || this.y > this.scene.engine.canvas.height) this.active = false;
-    }
-
-    homeInOnTarget(dt) {
-        let closestEnemy = null;
-        let minDistanceSq = Infinity; // A legkisebb távolság (négyzetesen, hogy spóroljunk a CPU-val)
-
-        // 1. Megkeressük a legközelebbi aktív ellenséget a pályán
-        this.scene.enemyPool.pool.forEach(enemy => {
-            if (!enemy.active) return;
-
-            // Pitagorasz-tétel (gyökvonás nélkül gyorsabb)
-            const distSq = (enemy.x - this.x) ** 2 + (enemy.y - this.y) ** 2;
-
-            if (distSq < minDistanceSq) {
-                minDistanceSq = distSq;
-                closestEnemy = enemy;
-            }
-        });
-
-        // 2. Ha találtunk célpontot, forduljunk felé!
-        if (closestEnemy) {
-            const desiredAngle = Math.atan2(closestEnemy.y - this.y, closestEnemy.x - this.x);
-            let currentAngle = Math.atan2(this.speedY, this.speedX);
-
-            let angleDiff = desiredAngle - currentAngle;
-            while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
-            while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-
-            const maxTurnThisFrame = this.turnSpeed * dt;
-
-            if (Math.abs(angleDiff) <= maxTurnThisFrame) {
-                currentAngle = desiredAngle;
-            } else {
-                currentAngle += Math.sign(angleDiff) * maxTurnThisFrame;
-            }
-
-            this.speedX = Math.cos(currentAngle) * this.speed;
-            this.speedY = Math.sin(currentAngle) * this.speed;
+        
+        this.x += this.speedX * dt; 
+        this.y += this.speedY * dt;
+        
+        if (this.x < 0 || this.x > this.canvas.width || this.y < 0 || this.y > this.canvas.height) {
+            this.active = false;
         }
     }
 }

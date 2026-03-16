@@ -1,13 +1,17 @@
 export class EncyclopediaScene {
     constructor(engine) {
         this.engine = engine;
-        this.enemies = engine.datas.enemies;
+        this.enemies = null;
     }
 
-    init() {
+    init(state, datas) {
+        this.state = state;
+        this.datas = datas;
+        this.enemies = this.datas.enemies;
+
         this.engine.uiManager.showScreen('encyclopedia-screen');
         this.engine.uiManager.bindButtonEvents({
-            onBack: () => this.engine.changeScene('menu')
+            onBack: () => this.engine.sceneManager.changeScene('menu')
         });
 
         this.setupTabs();
@@ -36,7 +40,6 @@ export class EncyclopediaScene {
         let enemiesInfoContainer = document.getElementById("enemies-container");
         enemiesInfoContainer.innerHTML = "";
 
-        // Állítsuk le az előző animációt, ha volt
         if (this.encycAnimId) {
             cancelAnimationFrame(this.encycAnimId);
         }
@@ -71,29 +74,22 @@ export class EncyclopediaScene {
         let angle = 0;
 
         const animate = () => {
-            angle += 0.005; // A forgás sebessége
+            angle += 0.005; 
 
             canvasesToAnimate.forEach(item => {
                 const { canvas, ctx, enemy } = item;
 
-                // Előző képkocka törlése
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-
                 ctx.save();
-
-                // Origó középre tolása és forgatás
                 ctx.translate(canvas.width / 2, canvas.height / 2);
                 ctx.rotate(angle);
 
-                // Stílusok
                 ctx.strokeStyle = enemy.color;
                 ctx.lineWidth = 3;
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = enemy.color;
 
-                // Rajzolás az eredeti méretekkel
                 ctx.strokeRect(-enemy.width / 2, -enemy.height / 2, enemy.width, enemy.height);
-
                 ctx.restore();
             });
 
@@ -102,5 +98,4 @@ export class EncyclopediaScene {
 
         animate();
     }
-
 }
